@@ -5,8 +5,46 @@ use App\Http\Controllers\UtilisateurController;
 use Illuminate\Support\Facades\Route;
 // Page d'accueil
 // ------------------------
-Route::get('/', function () {
-    return view('accueil');
+Route::get('/', function () { return view('page_accueil'); });
+// Front-end
+
+///Présentation entreprise
+///
+Route::get('/entreprise', function () { return view('entreprise'); });
+Route::get('/equipe', function () { return view('equipe'); });
+Route::get('/histoire', function () { return view('histoire'); });
+
+
+//Partenariats
+Route::get('/Demandes', function () { return view('demande_partenaire'); });
+Route::get('/Partenaire', function () { return view('nos_partenaire'); });
+
+//contact
+Route::get('/contact', function () {return view('contact'); });
+
+//Actualite
+Route::get('/Actualites', function () {
+    return view('list_actualites');
+
+});
+
+//je mettrait le reste d'actualité après quand base de données Actualité sera fait
+
+//Activité
+
+
+Route::prefix('Activites')->group(function () {
+    Route::get('administration', function () { return view('administration'); });
+    Route::get('extraction', function () { return view('extraction'); });
+    Route::get('logistique', function () { return view('logistique'); });
+    Route::get('recherche', function () { return view('recherche'); });
+});
+
+//Raports environnement
+Route::prefix('Rapport')->group(function () {
+    Route::get('Archive', function () { return view('archive'); });
+    Route::get('Mensuels', function () { return view('rapport_mensuels'); });
+    Route::get('Trimestriel', function () { return view('rapport_trimestriel'); });
 });
 
 // ------------------------

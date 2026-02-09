@@ -1,3 +1,6 @@
+
+<!-- resources/views/includes/menu.blade.php -->
+
 <a href="{{ url('connexion') }}">
     <button>Espace Pro</button>
 </a>

@@ -10,21 +10,21 @@ Route::get('/', function () { return view('page_accueil'); });
 
 ///Présentation entreprise
 ///
-Route::get('/entreprise', function () { return view('entreprise'); });
-Route::get('/equipe', function () { return view('equipe'); });
-Route::get('/histoire', function () { return view('histoire'); });
+Route::get('/entreprise', function () { return view('Front-end.presentation.entreprise'); });
+Route::get('/equipe', function () { return view('Front-end.presentation.equipe'); });
+Route::get('/histoire', function () { return view('Front-end.presentation.histoire'); });
 
 
 //Partenariats
-Route::get('/Demandes', function () { return view('demande_partenaire'); });
-Route::get('/Partenaire', function () { return view('nos_partenaire'); });
+Route::get('/Demandes', function () { return view('Front-end.partenariats.demande_partenaire'); });
+Route::get('/Partenaire', function () { return view('Front-end.partenariats.nos_partenaire'); });
 
 //contact
-Route::get('/contact', function () {return view('contact'); });
+Route::get('/contact', function () {return view('Front-end.contact.contact'); });
 
 //Actualite
 Route::get('/Actualites', function () {
-    return view('list_actualites');
+    return view('Front-end.actualite.list_actualite');
 
 });
 
@@ -34,17 +34,17 @@ Route::get('/Actualites', function () {
 
 
 Route::prefix('Activites')->group(function () {
-    Route::get('administration', function () { return view('administration'); });
-    Route::get('extraction', function () { return view('extraction'); });
-    Route::get('logistique', function () { return view('logistique'); });
-    Route::get('recherche', function () { return view('recherche'); });
+    Route::get('administration', function () { return view('Front-end.activite.administration'); });
+    Route::get('extraction', function () { return view('Front-end.activite.extraction'); });
+    Route::get('logistique', function () { return view('Front-end.activite.logistique'); });
+    Route::get('recherche', function () { return view('Front-end.activite.recherche'); });
 });
 
 //Raports environnement
 Route::prefix('Rapport')->group(function () {
-    Route::get('Archive', function () { return view('archive'); });
-    Route::get('Mensuels', function () { return view('rapport_mensuels'); });
-    Route::get('Trimestriel', function () { return view('rapport_trimestriel'); });
+    Route::get('Archive', function () { return view('Front-end.rapports_enviro.archive'); });
+    Route::get('Mensuels', function () { return view('Front-end.rapports_enviro.rapport_mensuels'); });
+    Route::get('Trimestriel', function () { return view('Front-end.rapports_enviro.rapport_trimestriel'); });
 });
 
 // ------------------------
@@ -52,7 +52,7 @@ Route::prefix('Rapport')->group(function () {
 // ------------------------
 // Formulaire de connexion
 Route::get('/connexion', function () {
-    return view('connexion');
+    return view('back_end.connexion');
 })->name('login.form');
 
 // Rediriger GET /login vers le formulaire

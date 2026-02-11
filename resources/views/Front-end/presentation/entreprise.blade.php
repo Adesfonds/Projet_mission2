@@ -3,9 +3,6 @@
 
 @section('title', 'Equipe')
 
-
-
-
 @section('content')
     <section id="presentation-entreprise">
     <h1>Présentation de l’entreprise</h1>

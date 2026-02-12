@@ -5,50 +5,29 @@ namespace App\Http\Controllers;
 use App\Models\Utilisateur;
 use App\Models\Role;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UtilisateurController extends Controller
 {
     // ------------------------
-    // Authentification
-    // ------------------------
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:5',
-        ]);
-
-        // Recherche de l'utilisateur par email et mot de passe en clair
-        $user = DB::table('utilisateur')
-            ->where('email', $request->email)
-            ->where('uti_mdp', $request->password)
-            ->first();
-
-        if ($user) {
-            session(['utilisateur' => $user]);
-            return redirect()->route('tableau_bord');
-        }
-
-        return back()->withErrors([
-            'email' => 'Adresse mail ou mot de passe incorrect',
-        ]);
-    }
-
-    // ------------------------
-    // Liste des utilisateurs
+    // Liste des utilisateurs (admin uniquement)
     // ------------------------
     public function gestion()
     {
+        $this->authorizeAdmin();
+
         $utilisateurs = Utilisateur::with('role')->get();
         return view('back_end.gestion_utilisateur.gestion', compact('utilisateurs'));
     }
 
     // ------------------------
-    // Formulaire d'ajout
+    // Formulaire d'ajout (admin)
     // ------------------------
     public function ajout()
     {
+        $this->authorizeAdmin();
+
         $roles = Role::all();
         return view('back_end.gestion_utilisateur.profil_ajout', compact('roles'));
     }
@@ -58,21 +37,24 @@ class UtilisateurController extends Controller
     // ------------------------
     public function store(Request $request)
     {
+        $this->authorizeAdmin();
+
         $request->validate([
             'uti_nom' => 'required|string|max:255',
-            'email' => 'required|email|unique:utilisateur,email',
-            'password' => 'required|min:5',
-            'role_id' => 'required|exists:role,id_role'
+            'email' => 'required|email|unique:utilisateurs,email',
+            'password' => 'required|min:5|confirmed', // confirmation password
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         Utilisateur::create([
             'uti_nom' => $request->uti_nom,
             'email' => $request->email,
-            'uti_mdp' => $request->password, // mot de passe en clair
-            'id_roles' => $request->role_id
+            'uti_mdp' => Hash::make($request->password), // hashé
+            'id_roles' => $request->role_id,
         ]);
 
-        return redirect()->route('gestion_utilisateur')->with('success', 'Utilisateur ajouté avec succès !');
+        return redirect()->route('gestion_utilisateur')
+            ->with('success', 'Utilisateur ajouté avec succès !');
     }
 
     // ------------------------
@@ -80,6 +62,8 @@ class UtilisateurController extends Controller
     // ------------------------
     public function edit(Utilisateur $utilisateur)
     {
+        $this->authorizeAdmin();
+
         $roles = Role::all();
         return view('back_end.gestion_utilisateur.profil_ajout', compact('utilisateur', 'roles'));
     }
@@ -89,32 +73,31 @@ class UtilisateurController extends Controller
     // ------------------------
     public function update(Request $request, Utilisateur $utilisateur)
     {
-        $sessionUser = session('utilisateur');
-        $sessionUserModel = Utilisateur::with('role')->find($sessionUser->id_uti ?? 0);
-
-        // Vérifier que l'utilisateur connecté est admin
-        if (!$sessionUserModel || $sessionUserModel->role->libelle !== 'Admin') {
-            return redirect()->back()->with('error', 'Vous n’avez pas la permission de modifier ce rôle.');
-        }
+        $this->authorizeAdmin();
 
         $request->validate([
             'uti_nom' => 'required|string|max:255',
-            'email' => 'required|email|unique:utilisateur,email,' . $utilisateur->id_uti . ',id_uti',
-            'role_id' => 'required|exists:role,id_role',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('utilisateurs', 'email')->ignore($utilisateur->id),
+            ],
+            'role_id' => 'required|exists:roles,id',
+            'password' => 'nullable|min:5|confirmed',
         ]);
 
         $utilisateur->uti_nom = $request->uti_nom;
         $utilisateur->email = $request->email;
         $utilisateur->id_roles = $request->role_id;
 
-        // Mise à jour du mot de passe uniquement si rempli
         if ($request->filled('password')) {
-            $utilisateur->uti_mdp = $request->password; // mot de passe en clair
+            $utilisateur->uti_mdp = Hash::make($request->password);
         }
 
         $utilisateur->save();
 
-        return redirect()->route('gestion_utilisateur')->with('success', 'Utilisateur mis à jour avec succès !');
+        return redirect()->route('gestion_utilisateur')
+            ->with('success', 'Utilisateur mis à jour avec succès !');
     }
 
     // ------------------------
@@ -122,8 +105,12 @@ class UtilisateurController extends Controller
     // ------------------------
     public function destroy(Utilisateur $utilisateur)
     {
+        $this->authorizeAdmin();
+
         $utilisateur->delete();
-        return redirect()->route('gestion_utilisateur')->with('success', 'Utilisateur supprimé !');
+
+        return redirect()->route('gestion_utilisateur')
+            ->with('success', 'Utilisateur supprimé !');
     }
 
     // ------------------------
@@ -135,4 +122,13 @@ class UtilisateurController extends Controller
         return view('back_end.gestion_utilisateur.profil', compact('utilisateur', 'roles'));
     }
 
+    // ------------------------
+    // Vérifie si l'utilisateur connecté est admin
+    // ------------------------
+    private function authorizeAdmin()
+    {
+        if (!auth()->user() || !auth()->user()->isAdmin()) {
+            abort(403, 'Accès refusé.');
+        }
+    }
 }

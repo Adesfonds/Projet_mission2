@@ -25,22 +25,18 @@ class RoleController extends Controller
 
     public function gestionRoles()
     {
-        $user = session('utilisateur');
+        $user = auth()->user(); // utilisateur connecté
+
         if (!$user) {
             return redirect()->route('login.form');
         }
 
-        // Récupérer le rôle via id_roles
-        $role = DB::table('role')
-            ->join('utilisateur', 'role.id_role', '=', 'utilisateur.id_roles')
-            ->where('utilisateur.id_uti', $user->id_uti)
-            ->select('role.*')
-            ->first();
+        $user->load('role'); // charge la relation role
+        $role = $user->role;
 
-        // Définir les pages accessibles selon le rôle
         $pagesParRole = [
             'Admin' => [
-                ['name' => 'Gestion des utilisateurs', 'route' => 'gestion_utilisateurs'],
+                ['name' => 'Gestion des utilisateurs', 'route' => 'gestion_utilisateur'],
                 ['name' => 'Journalisation', 'route' => 'journal'],
                 ['name' => 'Relevés de terrain', 'route' => 'releves_terrain']
             ],
@@ -53,7 +49,7 @@ class RoleController extends Controller
                 ['name' => 'Stock', 'route' => 'stock']
             ],
             'Direction' => [
-                ['name' => 'Gestion des utilisateurs', 'route' => 'gestion_utilisateurs'],
+                ['name' => 'Gestion des utilisateurs', 'route' => 'gestion_utilisateur'],
                 ['name' => 'Journalisation', 'route' => 'journal'],
                 ['name' => 'Logistique', 'route' => 'logistique'],
                 ['name' => 'Stock', 'route' => 'stock'],
@@ -61,10 +57,11 @@ class RoleController extends Controller
             ]
         ];
 
-        $pages = $pagesParRole[$role->libelle] ?? [];
+        $pages = $pagesParRole[$role->libelle ?? ''] ?? [];
 
         return view('back_end.roles', compact('user', 'role', 'pages'));
     }
+
 
 
 }

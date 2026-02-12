@@ -33,4 +33,11 @@ class Utilisateur extends Model
     {
         return $this->belongsTo(Role::class, 'id_roles', 'id_role');
     }
+
+    // Vérifie si l'utilisateur est admin
+    public function isAdmin()
+    {
+        return $this->role && $this->role->libelle === 'Admin';
+    }
+
 }

@@ -61,19 +61,22 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Journalisation
-    Route::get('/back_end/journalisation/journal', fn() => view('back_end.journalisation.journal'))
+    Route::get('/journalisation', fn() => view('back_end.journalisation.journal'))
         ->name('journal');
 
     // Logistique & Stock
-    Route::get('/back_end/logistique/logistique', fn() => view('back_end.logistique.logistique'))
+    Route::get('/logistique', fn() => view('back_end.logistique.logistique'))
         ->name('logistique');
 
-    Route::get('/back_end/stock/stock', fn() => view('back_end.stock.stock'))
+    Route::get('/stock', fn() => view('back_end.stock.stock'))
         ->name('stock');
 
     // Relevés de terrain
-    Route::get('/back_end/releves-terrain', fn() => view('back_end.releve_terrain.releves_terrain'))
+    Route::get('/releves-terrain', fn() => view('back_end.releve_terrain.releves_terrain'))
         ->name('releves_terrain');
+
+    Route::get('/utilisateur-gestion', fn() => view('back_end.gestion_utilisateur.gestion'))
+        ->name('gestion_utilisateur');
 
 
 

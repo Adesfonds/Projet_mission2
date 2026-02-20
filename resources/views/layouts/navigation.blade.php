@@ -16,6 +16,9 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
+                <x-nav-link :href="route('gestion_utilisateur')" :active="request()->routeIs('journal')">
+                    {{ __('Gestion Utilisateur') }}
+                </x-nav-link>
                 <x-nav-link :href="route('journal')" :active="request()->routeIs('journal')">
                     {{ __('Journalisation') }}
                 </x-nav-link>

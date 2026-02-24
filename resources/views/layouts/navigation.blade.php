@@ -9,31 +9,46 @@
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
+                @auth
+                    @php
+                        $roleId = auth()->user()->id_roles;
+                    @endphp
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                </div>
-                <x-nav-link :href="route('gestion_utilisateur')" :active="request()->routeIs('journal')">
-                    {{ __('Gestion Utilisateur') }}
-                </x-nav-link>
-                <x-nav-link :href="route('journal')" :active="request()->routeIs('journal')">
-                    {{ __('Journalisation') }}
-                </x-nav-link>
+                    {{-- Gestion utilisateurs : Administrateur (1) et Direction (2) --}}
+                    @if(in_array($roleId, [1, 2]))
+                        <x-nav-link :href="route('gestion_utilisateur')" :active="request()->routeIs('gestion_utilisateur')">
+                            {{ __('Gestion Utilisateur') }}
+                        </x-nav-link>
+                    @endif
 
-                <x-nav-link :href="route('logistique')" :active="request()->routeIs('logistique')">
-                    {{ __('Logistique') }}
-                </x-nav-link>
+                    {{-- Journalisation : Administrateur (1), Direction (2), Technicien (4) --}}
+                    @if(in_array($roleId, [1, 2, 4]))
+                        <x-nav-link :href="route('journal')" :active="request()->routeIs('journal')">
+                            {{ __('Journalisation') }}
+                        </x-nav-link>
+                    @endif
 
-                <x-nav-link :href="route('stock')" :active="request()->routeIs('stock')">
-                    {{ __('Stock') }}
-                </x-nav-link>
+                    {{-- Logistique : Administrateur (1), Direction (2), Chef de site (3), Service logistique (5), Transporteur (8) --}}
+                    @if(in_array($roleId, [1, 2, 3, 5, 8]))
+                        <x-nav-link :href="route('logistique')" :active="request()->routeIs('logistique')">
+                            {{ __('Logistique') }}
+                        </x-nav-link>
+                    @endif
 
-                <x-nav-link :href="route('releves_terrain')" :active="request()->routeIs('releves_terrain')">
-                    {{ __('Relevés de terrain') }}
-                </x-nav-link>
+                    {{-- Stock : Administrateur (1), Direction (2), Chef de site (3), Service logistique (5) --}}
+                    @if(in_array($roleId, [1, 2, 3, 5]))
+                        <x-nav-link :href="route('stock')" :active="request()->routeIs('stock')">
+                            {{ __('Stock') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- Relevés de terrain : tous sauf restriction --}}
+                    @if(in_array($roleId, [1, 2, 3, 4, 5, 6, 7]))
+                        <x-nav-link :href="route('releves_terrain')" :active="request()->routeIs('releves_terrain')">
+                            {{ __('Relevés de terrain') }}
+                        </x-nav-link>
+                    @endif
+                @endauth
             </div>
 
             <!-- Settings Dropdown -->

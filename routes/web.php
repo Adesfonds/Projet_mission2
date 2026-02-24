@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -75,9 +77,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/releves-terrain', fn() => view('back_end.releve_terrain.releves_terrain'))
         ->name('releves_terrain');
 
-    Route::get('/utilisateur-gestion', fn() => view('back_end.gestion_utilisateur.gestion'))
-        ->name('gestion_utilisateur');
 
+    Route::get('/utilisateur-gestion', [UserController::class, 'index'])
+        ->name('gestion_utilisateur');
 
 
     // Profile utilisateur

@@ -12,12 +12,13 @@ class RoleController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $user->load('roles');
+
+        // charge la relation role (pas roles)
+        $user->load('role');
 
         $role = $user->role;
 
         $pagesParRole = [
-
             'Administrateur' => [
                 ['name' => 'Gestion des utilisateurs', 'route' => 'gestion_utilisateur'],
                 ['name' => 'Logistique', 'route' => 'logistique'],
@@ -25,7 +26,6 @@ class RoleController extends Controller
                 ['name' => 'Journalisation', 'route' => 'journal'],
                 ['name' => 'Relevés de terrain', 'route' => 'releves_terrain']
             ],
-
             'Direction' => [
                 ['name' => 'Gestion des utilisateurs', 'route' => 'gestion_utilisateur'],
                 ['name' => 'Logistique', 'route' => 'logistique'],
@@ -33,42 +33,34 @@ class RoleController extends Controller
                 ['name' => 'Journalisation', 'route' => 'journal'],
                 ['name' => 'Relevés de terrain', 'route' => 'releves_terrain']
             ],
-
             'Chef de site' => [
                 ['name' => 'Logistique', 'route' => 'logistique'],
                 ['name' => 'Stock', 'route' => 'stock'],
                 ['name' => 'Relevés de terrain', 'route' => 'releves_terrain']
             ],
-
             'Technicien' => [
                 ['name' => 'Relevés de terrain', 'route' => 'releves_terrain'],
                 ['name' => 'Journalisation', 'route' => 'journal']
             ],
-
             'Service logistique' => [
                 ['name' => 'Logistique', 'route' => 'logistique'],
                 ['name' => 'Stock', 'route' => 'stock']
             ],
-
             'Chercheur' => [
                 ['name' => 'Relevés de terrain', 'route' => 'releves_terrain']
             ],
-
             'Partenaire externe' => [
                 ['name' => 'Relevés de terrain', 'route' => 'releves_terrain']
             ],
-
             'Transporteur' => [
                 ['name' => 'Logistique', 'route' => 'logistique']
             ],
-
         ];
 
         $pages = $pagesParRole[$role->libelle ?? ''] ?? [];
 
         return view('back_end.roles', compact('user', 'role', 'pages'));
     }
-
 
     /**
      * Show the form for creating a new resource.

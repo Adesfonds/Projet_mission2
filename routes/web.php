@@ -81,6 +81,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/utilisateur-gestion', [UserController::class, 'index'])
         ->name('gestion_utilisateur');
 
+    Route::post('/utilisateur', [UserController::class, 'store'])
+        ->name('users.store');
+
+    Route::delete('/utilisateur/{id}', [UserController::class, 'delete'])
+        ->name('users.delete');
+
+
 
     // Profile utilisateur
     Route::prefix('profile')->group(function () {

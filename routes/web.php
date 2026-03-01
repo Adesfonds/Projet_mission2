@@ -86,6 +86,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/utilisateur/{id}', [UserController::class, 'delete'])
         ->name('users.delete');
+    Route::put('/utilisateur/{user}', [UserController::class, 'update'])
+        ->name('users.update');
 
 
 

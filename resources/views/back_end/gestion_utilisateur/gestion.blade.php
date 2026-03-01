@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+            {{ __('Gestion des utilisateurs') }}
+        </>
     </x-slot>
 
-    <h2>Gestion des utilisateurs</h2>
+
 
     <table border="1" cellpadding="10">
         <thead>
@@ -42,10 +42,19 @@
         @csrf
 
         <label>Nom</label>
-        <input type="text" name="uti_nom" required/>
+        <input
+            type="text"
+            name="name"
+            required
+            maxlength="255"
+        />
 
         <label>Adresse mail</label>
-        <input type="email" name="email" required minlength="5"/>
+        <input
+            type="email"
+            name="email"
+            required
+        />
 
         <label>Mot de passe</label>
         <input
@@ -53,12 +62,13 @@
             name="password"
             required
             minlength="5"
-            pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}"
-            title="Au moins 5 caractères, une lettre, un chiffre et un caractère spécial"
+            pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&]).{5,}"
+            title="Minimum 5 caractères, au moins une lettre, un chiffre et un caractère spécial"
         />
 
-        <label>Rôles</label>
-        <select name="role_id" id="role_id">
+        <label>Rôle</label>
+        <select name="role_id" required>
+            <option value="">-- Choisir un rôle --</option>
             @foreach($roles as $role)
                 <option value="{{ $role->id_role }}">
                     {{ $role->libelle_ }}
@@ -68,5 +78,35 @@
 
         <button type="submit">Ajouter</button>
     </form>
+    @foreach($users as $user)
+        <form action="{{ route('users.update', $user->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <label>Nom</label>
+            <input type="text" name="name" value="{{ $user->name }}" required>
+
+            <label>Email</label>
+            <input type="email" name="email" value="{{ $user->email }}" required>
+
+            <label>Rôle</label>
+            <select name="role_id" required>
+                @foreach($roles as $role)
+                    <option value="{{ $role->id_role }}"
+                        {{ $user->id_roles == $role->id_role ? 'selected' : '' }}>
+                        {{ $role->libelle_ }}
+                    </option>
+                @endforeach
+            </select>
+
+            <label>Nouveau mot de passe</label>
+            <input type="password" name="password">
+
+            <label>Confirmer mot de passe</label>
+            <input type="password" name="password_confirmation">
+
+            <button type="submit">Mettre à jour</button>
+        </form>
+    @endforeach
 
 </x-app-layout>

@@ -58,6 +58,7 @@ class UserController extends Controller
             'password' => 'nullable|min:5|confirmed',
         ]);
 
+
         // Mise à jour des champs
         $user->name = $request->name;
         $user->email = $request->email;
@@ -70,7 +71,10 @@ class UserController extends Controller
 
         $user->save();
 
+
+
         return redirect()->route('gestion_utilisateur')
             ->with('success', 'Utilisateur mis à jour avec succès !');
+
     }
 }

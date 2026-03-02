@@ -79,6 +79,15 @@
         <button type="submit">Ajouter</button>
     </form>
     @foreach($users as $user)
+        <h2>Mise a jour de utilisateur</h2>
+
+        @if ($errors->any())
+            <div style="color:red;">
+                @foreach ($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
         <form action="{{ route('users.update', $user->id) }}" method="POST">
             @csrf
             @method('PUT')

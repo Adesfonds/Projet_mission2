@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Models\Log;
 
 
 /*
@@ -63,8 +64,12 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Journalisation
-    Route::get('/journalisation', fn() => view('back_end.journalisation.journal'))
-        ->name('journal');
+
+    Route::get('/journalisation', function () {
+        $logs = Log::orderBy('created_at', 'desc')->paginate(20);
+
+        return view('back_end.journalisation.journal', compact('logs'));
+    })->middleware(['auth'])->name('journal');
 
     // Logistique & Stock
     Route::get('/logistique', fn() => view('back_end.logistique.logistique'))

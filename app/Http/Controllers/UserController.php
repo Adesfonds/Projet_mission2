@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Log;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+
+
 
 class UserController extends Controller
 {
@@ -32,14 +35,25 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'id_roles' => $request->role_id
         ]);
+        Log::create([
+            'action'     => 'Create',
+            'ip_adresse' => $request->ip(),
+            'id_uti'     => auth()->id(),
+        ]);
 
         return redirect()->route('gestion_utilisateur')
             ->with('success', 'Utilisateur ajouté avec succès');
     }
 
-    public function delete($id)
+    public function delete(Request $request,$id)
     {
         User::findOrFail($id)->delete();
+
+        Log::create([
+            'action'     => 'Delete',
+            'ip_adresse' => $request->ip(),
+            'id_uti'     => auth()->id(),
+        ]);
 
         return redirect()->back()
             ->with('success', 'Utilisateur supprimé');
@@ -68,10 +82,12 @@ class UserController extends Controller
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
-
+        Log::create([
+            'action'     => 'Update',
+            'ip_adresse' => $request->ip(),
+            'id_uti'     => auth()->id(),
+        ]);
         $user->save();
-
-
 
         return redirect()->route('gestion_utilisateur')
             ->with('success', 'Utilisateur mis à jour avec succès !');

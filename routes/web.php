@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -34,8 +34,8 @@ Route::prefix('partenariats')->group(function () {
     Route::get('/nos', fn() => view('Front-end.partenariats.nos_partenaire'));
 });
 
-// Contact
-Route::get('/contact', fn() => view('Front-end.contact.contact'));
+Route::get('/contact', [ContactController::class, 'index']);
+Route::post('/contact', [ContactController::class, 'send']);
 
 // Actualités
 Route::get('/actualites', fn() => view('Front-end.actualite.list_actualite'));

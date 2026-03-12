@@ -27,7 +27,15 @@ class CargaisonController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $cargaison = Cargaison::create([
+            'date_extraction' => now(),
+            'volume' => $request->volume,
+            'statut' => 'En attente de transport',
+            'id_site' => $request->id_site, // ID du site du Vercors
+            'id_uti' => auth()->id(),      // L'utilisateur connecté
+        ]);
+
+        return redirect()->back()->with('success', 'Extraction enregistrée.');
     }
 
     /**

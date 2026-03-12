@@ -5,7 +5,13 @@ use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Models\Log;
-
+use App\Http\Controllers\MaterielController;
+use App\Http\Controllers\CargaisonController;
+use App\Http\Controllers\TransportController;
+use App\Http\Controllers\FournisseurController;
+use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\MineraisController;
+use App\Http\Controllers\SiteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,6 +83,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/stock', fn() => view('back_end.stock.stock'))
         ->name('stock');
+    Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('materiel.show');
+    Route::get('/stock', [MaterielController::class, 'index'])->name('stock');
+    Route::post('/stock/update/{id}', [MaterielController::class, 'updateStock'])->name('stock.update');
 
     // Relevés de terrain
     Route::get('/releves-terrain', fn() => view('back_end.releve_terrain.releves_terrain'))

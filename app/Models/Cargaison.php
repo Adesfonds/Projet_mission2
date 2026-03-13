@@ -24,7 +24,7 @@ class Cargaison extends Model
     // Relation avec le site
     public function site()
     {
-        return $this->belongsTo(Site::class, 'id_site');
+        return $this->belongsTo(Site::class, 'id_site', 'id');
     }
 
     // Relation avec le transport
@@ -34,8 +34,8 @@ class Cargaison extends Model
     }
 
     // Relation avec l'utilisateur
-    public function utilisateur()
+    public function users()
     {
-        return $this->belongsTo(User::class, 'id_uti');
+        return $this->belongsTo(User::class, 'id_uti', 'id');
     }
 }

@@ -11,9 +11,12 @@ class CargaisonController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $cargaisons = Cargaison::with(['site','utilisateur','transport'])
+            ->orderBy('date_extraction','desc')
+            ->get();
 
+        return view('back_end.logistique.mouvement', compact('cargaisons'));
+    }
     /**
      * Show the form for creating a new resource.
      */

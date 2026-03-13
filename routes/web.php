@@ -1,10 +1,9 @@
 <?php
+
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Models\Log;
 use App\Http\Controllers\MaterielController;
 use App\Http\Controllers\CargaisonController;
 use App\Http\Controllers\TransportController;
@@ -12,6 +11,8 @@ use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\MineraisController;
 use App\Http\Controllers\SiteController;
+use App\Models\Log;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,7 @@ Route::prefix('partenariats')->group(function () {
     Route::get('/nos', fn() => view('Front-end.partenariats.nos_partenaire'));
 });
 
+// Contact
 Route::get('/contact', [ContactController::class, 'index']);
 Route::post('/contact', [ContactController::class, 'send']);
 
@@ -68,51 +70,56 @@ Route::prefix('rapport')->group(function () {
 */
 Route::middleware(['auth'])->group(function () {
 
-
     // Journalisation
-
     Route::get('/journalisation', function () {
         $logs = Log::orderBy('created_at', 'desc')->paginate(20);
-
         return view('back_end.journalisation.journal', compact('logs'));
-    })->middleware(['auth'])->name('journal');
+    })->name('journal');
 
     // Logistique & Stock
-    Route::get('/logistique', fn() => view('back_end.logistique.logistique'))
-        ->name('logistique');
+    Route::prefix('logistique')->group(function () {
+        Route::get('/', fn() => view('back_end.logistique.logistique'))->name('logistique');
 
-    Route::get('/stock', fn() => view('back_end.stock.stock'))
-        ->name('stock');
-    Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('materiel.show');
-    Route::get('/stock', [MaterielController::class, 'index'])->name('stock');
-    Route::post('/stock/update/{id}', [MaterielController::class, 'updateStock'])->name('stock.update');
+        // Stock
+        Route::get('/stock', [MaterielController::class, 'index'])->name('stock');
+        Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('materiel.show');
+        Route::post('/stock/update/{id}', [MaterielController::class, 'updateStock'])->name('stock.update');
+    });
+
+    // Cargaisons & Transports
+    Route::prefix('mouvements')->group(function () {
+        Route::get('/cargaisons', [CargaisonController::class, 'index'])->name('cargaisons.index');
+        Route::get('/cargaisons/create', [CargaisonController::class, 'create'])->name('cargaisons.create');
+        Route::post('/cargaisons', [CargaisonController::class, 'store'])->name('cargaisons.store');
+
+        Route::get('/transports', [TransportController::class, 'index'])->name('transports.index');
+        Route::post('/transports', [TransportController::class, 'store'])->name('transports.store');
+        Route::put('/transports/{id}', [TransportController::class, 'update'])->name('transports.update');
+        Route::get('/transports/{id}', [TransportController::class, 'show'])->name('transports.show');
+    });
 
     // Relevés de terrain
     Route::get('/releves-terrain', fn() => view('back_end.releve_terrain.releves_terrain'))
         ->name('releves_terrain');
 
-
-    Route::get('/utilisateur-gestion', [UserController::class, 'index'])
-        ->name('gestion_utilisateur');
-
-    Route::post('/utilisateur', [UserController::class, 'store'])
-        ->name('users.store');
-
-    Route::delete('/utilisateur/{id}', [UserController::class, 'delete'])
-        ->name('users.delete');
-    Route::put('/utilisateur/{user}', [UserController::class, 'update'])
-        ->name('users.update');
-
-
+    // Gestion des utilisateurs
+    Route::get('/utilisateur-gestion', [UserController::class, 'index'])->name('gestion_utilisateur');
+    Route::post('/utilisateur', [UserController::class, 'store'])->name('users.store');
+    Route::delete('/utilisateur/{id}', [UserController::class, 'delete'])->name('users.delete');
+    Route::put('/utilisateur/{user}', [UserController::class, 'update'])->name('users.update');
 
     // Profile utilisateur
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     });
+
 });
 
-// Auth routes (login, register, password, etc.)
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES (login, register, password, etc.)
+|--------------------------------------------------------------------------
+*/
 require __DIR__.'/auth.php';

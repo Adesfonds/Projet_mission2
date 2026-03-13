@@ -13,7 +13,7 @@ class TransportController extends Controller
     public function index()
     {
         $transports = Transport::orderBy('date_depart', 'desc')->get();
-        return view('transports.index', compact('transports'));
+        return view('back_end.logistique.suivi', compact('transports'));
     }
 
     /**

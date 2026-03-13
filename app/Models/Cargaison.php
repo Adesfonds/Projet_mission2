@@ -9,8 +9,8 @@ class Cargaison extends Model
 {
     use HasFactory;
 
-    protected $table = 'cargaison';          // nom de la table
-    protected $primaryKey = 'id_cargaison';  // clé primaire
+    protected $table = 'cargaison';
+    protected $primaryKey = 'id_cargaison';
 
     protected $fillable = [
         'date_extraction',
@@ -21,20 +21,20 @@ class Cargaison extends Model
         'id_uti'
     ];
 
-    // Relation avec le site
+    // Relation site
     public function site()
     {
         return $this->belongsTo(Site::class, 'id_site', 'id');
     }
 
-    // Relation avec le transport
+    // Relation transport
     public function transport()
     {
         return $this->belongsTo(Transport::class, 'id_transport');
     }
 
-    // Relation avec l'utilisateur
-    public function users()
+    // Relation utilisateur
+    public function utilisateur()
     {
         return $this->belongsTo(User::class, 'id_uti', 'id');
     }

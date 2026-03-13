@@ -11,7 +11,7 @@ class CargaisonController extends Controller
      */
     public function index()
     {
-        $cargaisons = Cargaison::with(['site','utilisateur','transport'])
+        $cargaisons = Cargaison::with(['site','users','transport'])
             ->orderBy('date_extraction','desc')
             ->get();
 

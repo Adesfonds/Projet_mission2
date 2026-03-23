@@ -34,7 +34,7 @@ class Cargaison extends Model
     }
 
     // Relation utilisateur
-    public function utilisateur()
+    public function users()
     {
         return $this->belongsTo(User::class, 'id_uti', 'id');
     }

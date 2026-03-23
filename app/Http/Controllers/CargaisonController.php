@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cargaison;
+use App\Models\Site;
+
 class CargaisonController extends Controller
 {
     /**
@@ -15,7 +17,9 @@ class CargaisonController extends Controller
             ->orderBy('date_extraction','desc')
             ->get();
 
-        return view('back_end.logistique.mouvement', compact('cargaisons'));
+        $sites = Site::all(); // <-- ici on récupère toutes les sites via le modèle
+
+        return view('back_end.logistique.mouvement', compact('cargaisons', 'sites'));
     }
     /**
      * Show the form for creating a new resource.
@@ -34,6 +38,7 @@ class CargaisonController extends Controller
             'date_extraction' => now(),
             'volume' => $request->volume,
             'statut' => 'En attente de transport',
+            'id_transport' =>$request->id_transport,
             'id_site' => $request->id_site, // ID du site du Vercors
             'id_uti' => auth()->id(),      // L'utilisateur connecté
         ]);
@@ -47,6 +52,24 @@ class CargaisonController extends Controller
     public function show(string $id)
     {
         //
+    }
+
+    public function transport(string $id)
+    {
+        $cargaison = Cargaison::findOrFail($id);
+        $cargaison->statut = 'En transport';
+        $cargaison->save();
+
+        return redirect()->back()->with('success','Cargaison mise en transport.');
+    }
+
+    public function stockage(string $id)
+    {
+        $cargaison = Cargaison::findOrFail($id);
+        $cargaison->statut = 'Stocké';
+        $cargaison->save();
+
+        return redirect()->back()->with('success','Cargaison stockée.');
     }
 
     /**

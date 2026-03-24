@@ -30,7 +30,7 @@
             <tbody>
             @foreach($cargaisons as $cargaison)
                 <tr>
-                    <td>{{ $cargaison->id }}</td>
+                    <td>{{ $cargaison->id_cargaison }}</td>
                     <td>{{ $cargaison->date_extraction }}</td>
                     <td>{{ $cargaison->site->nom ?? '—' }}</td>
                     <td>{{ $cargaison->volume }}</td>
@@ -48,12 +48,12 @@
                     </td>
                     <td>
                         @if($cargaison->statut == 'Extrait')
-                            <form action="{{ route('cargaisons.transport', $cargaison->id) }}" method="POST" class="d-inline">
+                            <form action="{{ route('cargaisons.transport', $cargaison->id_cargaison) }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-warning">Mettre en transport</button>
                             </form>
                         @elseif($cargaison->statut == 'En transport')
-                            <form action="{{ route('cargaisons.stockage', $cargaison->id) }}" method="POST" class="d-inline">
+                            <form action="{{ route('cargaisons.stockage', $cargaison->id_cargaison) }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-success">Mettre en stockage</button>
                             </form>

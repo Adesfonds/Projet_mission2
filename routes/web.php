@@ -86,12 +86,18 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/stock/update/{id}', [MaterielController::class, 'updateStock'])->name('stock.update');
     });
 
-    // Cargaisons & Transports
     Route::prefix('mouvements')->group(function () {
+
+        // Cargaisons
         Route::get('/cargaisons', [CargaisonController::class, 'index'])->name('cargaisons.index');
         Route::get('/cargaisons/create', [CargaisonController::class, 'create'])->name('cargaisons.create');
         Route::post('/cargaisons', [CargaisonController::class, 'store'])->name('cargaisons.store');
 
+        // Nouvelles routes pour changer le statut
+        Route::post('/cargaisons/{id}/transport', [CargaisonController::class, 'mettreEnTransport'])->name('cargaisons.transport');
+        Route::post('/cargaisons/{id}/stockage', [CargaisonController::class, 'mettreEnStockage'])->name('cargaisons.stockage');
+
+        // Transports
         Route::get('/transports', [TransportController::class, 'index'])->name('transports.index');
         Route::post('/transports', [TransportController::class, 'store'])->name('transports.store');
         Route::put('/transports/{id}', [TransportController::class, 'update'])->name('transports.update');

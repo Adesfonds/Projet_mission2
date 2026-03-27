@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Minerais;
 use Illuminate\Http\Request;
 use App\Models\Cargaison;
 use App\Models\Site;
@@ -14,13 +15,14 @@ class CargaisonController extends Controller
      */
     public function index()
     {
-        $cargaisons = Cargaison::with(['site', 'users', 'transport'])
+        $cargaisons = Cargaison::with(['site', 'users', 'transport', 'minerais'])
             ->orderBy('date_extraction', 'desc')
             ->get();
 
         $sites = Site::all();
+        $minerais = Minerais::all();
 
-        return view('back_end.logistique.mouvement', compact('cargaisons', 'sites'));
+        return view('back_end.logistique.mouvement', compact('cargaisons', 'sites', 'minerais'));
     }
 
     /**
@@ -34,6 +36,7 @@ class CargaisonController extends Controller
             'statut' => 'Extrait',   // Statut initial
             'id_site' => $request->id_site,
             'id_uti' => auth()->id(),
+            'id_minerais' => $request->id_minerais,
         ]);
 
         return redirect()->back()->with('success', 'Extraction enregistrée.');

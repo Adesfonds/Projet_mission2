@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 class Cargaison extends Model
 {
@@ -18,7 +19,8 @@ class Cargaison extends Model
         'statut',
         'id_transport',
         'id_site',
-        'id_uti'
+        'id_uti',
+        'id_minerais'
     ];
 
     // Relation site
@@ -37,5 +39,10 @@ class Cargaison extends Model
     public function users()
     {
         return $this->belongsTo(User::class, 'id_uti', 'id');
+    }
+    // Cargaison.php
+    public function minerais()
+    {
+        return $this->belongsTo(Minerais::class, 'id_minerais');
     }
 }

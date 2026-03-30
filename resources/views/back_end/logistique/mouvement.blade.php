@@ -7,23 +7,16 @@
 
     <div class="container mt-4">
 
-        <h2 class="mb-4">Mouvements de minerai</h2>
-
-        {{-- Messages de succès --}}
+        {{-- Messages --}}
         @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
-        {{-- Messages d'erreur --}}
         @if(session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
+            <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
         {{-- Tableau des cargaisons --}}
+        <h2 class="mb-4">Mouvements de minerai</h2>
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
             <tr>
@@ -45,26 +38,30 @@
                     <td>{{ $cargaison->minerai->nom ?? '—' }}</td>
                     <td>{{ $cargaison->volume }}</td>
                     <td>
-                        @if($cargaison->statut == 'Extrait')
-                            <span class="badge bg-primary">{{ $cargaison->statut }}</span>
-                        @elseif($cargaison->statut == 'En transport')
-                            <span class="badge bg-warning text-dark">{{ $cargaison->statut }}</span>
-                        @elseif($cargaison->statut == 'Stocké')
-                            <span class="badge bg-success">{{ $cargaison->statut }}</span>
-                        @else
-                            <span class="badge bg-secondary">{{ $cargaison->statut }}</span>
-                        @endif
+                        <span class="badge
+                            @if($cargaison->statut == 'Extrait') bg-primary
+                            @elseif($cargaison->statut == 'En transport') bg-warning text-dark
+                            @elseif($cargaison->statut == 'Stocké') bg-success
+                            @endif
+                        ">
+                            {{ $cargaison->statut }}
+                        </span>
                     </td>
                     <td>
+                        {{-- Bouton pour créer transport --}}
                         @if($cargaison->statut == 'Extrait')
-                            <form action="{{ route('cargaisons.transport', $cargaison->id_cargaison) }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-warning">Mettre en transport</button>
+                            <form method="GET" action="">
+                                <input type="hidden" name="selected_cargaison" value="{{ $cargaison->id_cargaison }}">
+                                <button class="btn btn-sm btn-info">Créer transport</button>
                             </form>
-                        @elseif($cargaison->statut == 'En transport')
-                            <form action="{{ route('cargaisons.stockage', $cargaison->id_cargaison) }}" method="POST" class="d-inline">
+                        @endif
+
+                        {{-- Bouton pour mettre en stockage --}}
+                        @if($cargaison->statut == 'En transport' && $cargaison->transport)
+                            <form action="{{ route('transports.arrive', $cargaison->transport->id) }}" method="POST" class="mt-1">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-success">Mettre en stockage</button>
+                                @method('PATCH')
+                                <button class="btn btn-sm btn-success">Mettre en stockage</button>
                             </form>
                         @endif
                     </td>
@@ -73,44 +70,62 @@
             </tbody>
         </table>
 
-    </div>
-
-    {{-- FORMULAIRE CREATION EXTRACTION --}}
-    <div class="container mt-5">
-        <h3>Nouvelle extraction</h3>
-        <form action="{{ route('cargaisons.store') }}" method="POST" class="mb-5">
-            @csrf
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label class="form-label">Volume extrait (tonnes)</label>
-                    <input type="number" name="volume" class="form-control" min="0" required>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Site d'extraction</label>
-                    <select name="id_site" class="form-control" required>
-                        @foreach($sites as $site)
-                            <option value="{{ $site->id }}">{{ $site->nom }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Minerai extrait</label>
-                    <select name="id_minerais" class="form-control" required>
-                        @foreach($minerais as $minerai)
-                            <option value="{{ $minerai->id }}">{{ $minerai->nom }}</option>
-                        @endforeach
-                    </select>
-                </div>
+        {{-- Formulaire création transport --}}
+        @if(request('selected_cargaison'))
+            <div class="container mt-5">
+                <h3>Créer un transport</h3>
+                <form action="{{ route('transports.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="cargaison_id" value="{{ request('selected_cargaison') }}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Date de départ</label>
+                            <input type="date" name="date_depart" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Date d'arrivée prévue</label>
+                            <input type="date" name="date_arrivee" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Destination</label>
+                            <input type="text" name="destination" class="form-control" placeholder="Adresse..." required>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3">Créer le transport</button>
+                </form>
             </div>
+        @endif
 
-            <div class="row">
-                <div class="col-md-12 d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Enregistrer l'extraction</button>
+        {{-- Formulaire extraction --}}
+        <div class="container mt-5">
+            <h3>Nouvelle extraction</h3>
+            <form action="{{ route('cargaisons.store') }}" method="POST">
+                @csrf
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Volume (tonnes)</label>
+                        <input type="number" name="volume" class="form-control" min="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Site</label>
+                        <select name="id_site" class="form-control" required>
+                            @foreach($sites as $site)
+                                <option value="{{ $site->id }}">{{ $site->nom }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Minerai</label>
+                        <select name="id_minerais" class="form-control" required>
+                            @foreach($minerais as $minerai)
+                                <option value="{{ $minerai->id }}">{{ $minerai->nom }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </form>
-    </div>
+                <button class="btn btn-primary">Enregistrer l'extraction</button>
+            </form>
+        </div>
 
+    </div>
 </x-app-layout>

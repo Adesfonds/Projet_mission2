@@ -3,62 +3,88 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Transport;
+use App\Models\Cargaison;
+
 
 class TransportController extends Controller
 {
     /**
-     * SUIVI EN TEMPS RÉEL
-     * Remplace le tableau noir ou le cahier papier.
+     * Affiche tous les transports
      */
     public function index()
     {
-        $transports = Transport::orderBy('date_depart', 'desc')->get();
-        return view('back_end.logistique.suivi', compact('transports'));
+        $transports = Transport::with('cargaisons')->orderBy('date_depart', 'desc')->get();
+        $cargaisons = Cargaison::all();
+        return view('back_end.logistique.suivi', compact('transports', 'cargaisons'));
     }
 
     /**
-     * ENREGISTREMENT DU MOUVEMENT
-     * Remplace l'instruction donnée par téléphone.
+     * Enregistre un nouveau transport
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'date_depart' => 'required|date',
-            'destination' => 'required|string',
-            'statut_transport' => 'required|string', // ex: 'Prêt', 'En cours'
+            'cargaison_id'  => 'required|exists:cargaison,id_cargaison',
+            'date_depart'   => 'required|date',
+            'date_arrivee'  => 'required|date',
+            'destination'   => 'required|string',
         ]);
 
-        Transport::create($validated);
+        // Créer le transport
+        $transport = Transport::create([
+            'cargaison_id'     => $validated['cargaison_id'],
+            'date_depart'      => $validated['date_depart'],
+            'date_arrivee'     => $validated['date_arrivee'],
+            'destination'      => $validated['destination'],
+            'statut_transport' => 'En transport', // <- obligatoire
+        ]);
 
-        return redirect()->route('transports.index')->with('success', 'Transport planifié avec succès.');
+        // Mettre à jour le statut de la cargaison
+        $cargaison = Cargaison::findOrFail($validated['cargaison_id']);
+        $cargaison->statut = 'En transport';
+        $cargaison->save();
+
+        return redirect()->route('transports.index')->with('success', 'Transport créé et statut de la cargaison mis à jour.');
     }
-
     /**
-     * GÉNÉRATION DU BON DE TRANSPORT (VIRTUEL)
-     * Montre les détails d'une cargaison précise.
+     * Affiche un transport précis (bon de transport)
      */
     public function show(string $id)
     {
         $transport = Transport::findOrFail($id);
-        // Ici, on pourrait appeler une vue spéciale "Bon de Transport" à imprimer
         return view('transports.show', compact('transport'));
     }
 
     /**
-     * TRACAGE DES DÉPLACEMENTS
-     * Permet de mettre à jour le statut dès que le chauffeur arrive.
+     * Met à jour le transport (ex: statut)
      */
     public function update(Request $request, string $id)
     {
         $transport = Transport::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'statut_transport' => 'required|string',
-            'date_arrivee' => 'nullable|date'
+            'date_arrivee'     => 'nullable|date',
         ]);
 
-        $transport->update($request->all());
+        $transport->update($validated);
 
         return redirect()->route('transports.index')->with('info', 'Statut mis à jour.');
+    }
+    public function arrive($id)
+    {
+        $transport = Transport::findOrFail($id);
+
+        // Mettre à jour le statut du transport si tu veux
+        $transport->statut_transport = 'Arrivé';
+        $transport->save();
+
+        // Mettre à jour la cargaison
+        if ($transport->cargaison) {
+            $transport->cargaison->statut = 'Stocké';
+            $transport->cargaison->save();
+        }
+
+        return redirect()->route('transports.index')->with('success', 'Transport terminé, cargaison mise en stock.');
     }
 }

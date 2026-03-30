@@ -102,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/transports', [TransportController::class, 'store'])->name('transports.store');
         Route::put('/transports/{id}', [TransportController::class, 'update'])->name('transports.update');
         Route::get('/transports/{id}', [TransportController::class, 'show'])->name('transports.show');
+        Route::patch('/transports/{id}/arrive', [TransportController::class, 'arrive'])->name('transports.arrive');
     });
 
     // Relevés de terrain

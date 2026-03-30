@@ -58,8 +58,9 @@ class CargaisonController extends Controller
         $transport = Transport::create([
             'date_depart' => now(),
             'date_arrivee' => null,
-            'destination' => 'À définir',  // Tu peux ajouter un champ pour choisir la destination
-            'statut_transport' => 'En cours',
+            'destination' => 'À définir',
+            'statut_transport' => 'En transport',
+            'id_cargaison' => $cargaison->id_cargaison, // <-- lien direct
         ]);
 
         // Met à jour la cargaison
@@ -73,27 +74,24 @@ class CargaisonController extends Controller
     /**
      * Met une cargaison en stockage.
      */
-    public function mettreEnStockage($id_cargaison)
+    public function mettreEnStockage($id_transport)
     {
-        $cargaison = Cargaison::findOrFail($id_cargaison);
+        $transport = Transport::with('cargaison')->findOrFail($id_transport);
 
-        // Vérifie le statut avant le stockage
-        if ($cargaison->statut !== 'En transport') {
-            return redirect()->back()->with('error', 'Cette cargaison ne peut pas être mise en stockage.');
+        if ($transport->statut_transport !== 'En transport') {
+            return redirect()->back()->with('error', 'Ce transport ne peut pas être mis en stockage.');
         }
 
-        // Mets à jour le statut de la cargaison
-        $cargaison->statut = 'Stocké';
-        $cargaison->save();
+        $transport->statut_transport = 'Terminé';
+        $transport->date_arrivee = now();
+        $transport->save();
 
-        // Optionnel : mettre à jour le transport comme terminé
-        if ($cargaison->id_transport) {
-            $transport = Transport::find($cargaison->id_transport);
-            $transport->statut_transport = 'Terminé';
-            $transport->date_arrivee = now();
-            $transport->save();
+        $cargaison = $transport->cargaison;
+        if ($cargaison) {
+            $cargaison->statut = 'Stocké';
+            $cargaison->save();
         }
 
-        return redirect()->back()->with('success', 'Cargaison mise en stockage.');
+        return redirect()->back()->with('success', 'Cargaison mise en stockage avec succès.');
     }
 }

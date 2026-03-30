@@ -22,6 +22,6 @@ class Transport extends Model
     // Relation avec les cargaisons transportées
     public function cargaisons()
     {
-        return $this->hasMany(Cargaison::class, 'id_transport');
+        return $this->hasMany(Cargaison::class, 'id_cargaison');
     }
 }

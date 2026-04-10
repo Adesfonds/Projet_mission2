@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Transport;
 use App\Models\Cargaison;
-
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class TransportController extends Controller
 {
@@ -47,7 +48,7 @@ class TransportController extends Controller
         return redirect()->route('transports.index')->with('success', 'Transport créé et statut de la cargaison mis à jour.');
     }
     /**
-     * Affiche un transport précis (bon de transport)
+     * Affiche un transport précis (bons de transport)
      */
     public function show(string $id)
     {
@@ -86,5 +87,21 @@ class TransportController extends Controller
         }
 
         return redirect()->route('transports.index')->with('success', 'Transport terminé, cargaison mise en stock.');
+    }
+
+    public function genererBonTransport($id)
+    {
+        $transport = Transport::with('cargaisons')->findOrFail($id);
+
+        $pdf = Pdf::loadView('back_end.logistique.PDF', compact('transport'));
+
+        $fileName = 'bon_transport_'.$transport->id_transport.'.pdf';
+
+        Storage::disk('public')->put('bons/'.$fileName, $pdf->output());
+
+        return response()->json([
+            'message' => 'Bon de transport généré',
+            'pdf' => asset('storage/bons/'.$fileName)
+        ]);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\MouvementStockController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\MineraisController;
 use App\Http\Controllers\SiteController;
 use App\Models\Log;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +105,10 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/transports/{id}', [TransportController::class, 'update'])->name('transports.update');
         Route::get('/transports/{id}', [TransportController::class, 'show'])->name('transports.show');
         Route::patch('/transports/{id}/arrive', [TransportController::class, 'arrive'])->name('transports.arrive');
+
+        Route::get('/transports/bon/{id}', [TransportController::class, 'genererBonTransport'])->name('bons.transport');
+        // Télécharger un bons de mouvement
+        Route::get('/stock/bons/{id}', [MouvementStockController::class, 'show'])->name('mouvements.stock.bons');
     });
 
     // Relevés de terrain

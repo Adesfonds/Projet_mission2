@@ -25,35 +25,53 @@ class TransportController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'cargaison_id'  => 'required|exists:cargaison,id_cargaison',
-            'date_depart'   => 'required|date',
-            'date_arrivee'  => 'required|date',
-            'destination'   => 'required|string',
+            'cargaison_id' => 'required|exists:cargaison,id_cargaison',
+            'date_depart' => 'required|date',
+            'date_arrivee' => 'required|date',
+            'destination' => 'required|string',
         ]);
 
         // Créer le transport
         $transport = Transport::create([
-            'cargaison_id'     => $validated['cargaison_id'],
-            'date_depart'      => $validated['date_depart'],
-            'date_arrivee'     => $validated['date_arrivee'],
-            'destination'      => $validated['destination'],
+            'cargaison_id' => $validated['cargaison_id'],
+            'date_depart' => $validated['date_depart'],
+            'date_arrivee' => $validated['date_arrivee'],
+            'destination' => $validated['destination'],
             'statut_transport' => 'En transport', // <- obligatoire
         ]);
+
 
         // Mettre à jour le statut de la cargaison
         $cargaison = Cargaison::findOrFail($validated['cargaison_id']);
         $cargaison->statut = 'En transport';
         $cargaison->save();
+        // 3. Charger relation
+        $transport->load('cargaisons');
 
-        return redirect()->route('transports.index')->with('success', 'Transport créé et statut de la cargaison mis à jour.');
+        // 4. Générer PDF
+        $pdf = Pdf::loadView('back_end.logistique.PDF', compact('transport'));
+
+        $fileName = 'bon_transport_' . $transport->id_transport . '.pdf';
+
+        Storage::disk('public')->makeDirectory('bons');
+        // 5. Sauvegarder PDF
+
+        $path = 'bons/'.$fileName;
+
+         Storage::disk('public')->put($path, $pdf->output());
+
+
+        // 6. Télécharger PDF
+        return $pdf->download($fileName);
     }
+
     /**
      * Affiche un transport précis (bons de transport)
      */
     public function show(string $id)
     {
         $transport = Transport::findOrFail($id);
-        return view('transports.show', compact('transport'));
+        return view('back_end.logistique.suivi', compact('transport'));
     }
 
     /**
@@ -65,13 +83,14 @@ class TransportController extends Controller
 
         $validated = $request->validate([
             'statut_transport' => 'required|string',
-            'date_arrivee'     => 'nullable|date',
+            'date_arrivee' => 'nullable|date',
         ]);
 
         $transport->update($validated);
 
         return redirect()->route('transports.index')->with('info', 'Statut mis à jour.');
     }
+
     public function arrive($id)
     {
         $transport = Transport::findOrFail($id);
@@ -89,6 +108,7 @@ class TransportController extends Controller
         return redirect()->route('transports.index')->with('success', 'Transport terminé, cargaison mise en stock.');
     }
 
+
     public function genererBonTransport($id)
     {
         $transport = Transport::with('cargaisons')->findOrFail($id);
@@ -97,11 +117,12 @@ class TransportController extends Controller
 
         $fileName = 'bon_transport_'.$transport->id_transport.'.pdf';
 
+        Storage::disk('public')->makeDirectory('bons');
+
         Storage::disk('public')->put('bons/'.$fileName, $pdf->output());
 
-        return response()->json([
-            'message' => 'Bon de transport généré',
-            'pdf' => asset('storage/bons/'.$fileName)
-        ]);
+
+
+        return $pdf->download($fileName);
     }
 }

@@ -109,6 +109,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/transports/bon/{id}', [TransportController::class, 'genererBonTransport'])->name('bons.transport');
         // Télécharger un bons de mouvement
         Route::get('/stock/bons/{id}', [MouvementStockController::class, 'show'])->name('mouvements.stock.bons');
+
+        Route::get('/listePDF', [TransportController::class, 'listePDF'])
+            ->name('logistique.liste_pdf');
     });
 
     // Relevés de terrain

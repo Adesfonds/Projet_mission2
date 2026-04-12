@@ -18,6 +18,10 @@
                    class="px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('transports.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-200' }}">
                     Suivi des transports
                 </a>
+                <a href="{{ route('logistique.liste_pdf') }}"
+                   class="px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('logistique.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-200' }}">
+                    Bons de transport
+                </a>
             </nav>
         </div>
     </div>

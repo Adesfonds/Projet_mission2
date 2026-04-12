@@ -101,13 +101,13 @@
         <th>Statut</th>
     </tr>
     </thead>
-    <tbody>
-    <tr>
-        <td>{{ $transport->cargaisons->id_cargaison ?? '—' }}</td>
-        <td>{{ $transport->cargaisons->volume ?? '—' }}</td>
-        <td>{{ $transport->cargaisons->statut ?? '—' }}</td>
-    </tr>
-    </tbody>
+    @foreach($transport->cargaisons as $cargaison)
+        <tr>
+            <td>{{ $cargaison->id_cargaison }}</td>
+            <td>{{ $cargaison->volume }}</td>
+            <td>{{ $cargaison->statut }}</td>
+        </tr>
+    @endforeach
 </table>
 
 <!-- FOOTER -->

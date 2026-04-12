@@ -88,6 +88,7 @@ class TransportController extends Controller
 
         $transport->update($validated);
 
+
         return redirect()->route('transports.index')->with('info', 'Statut mis à jour.');
     }
 
@@ -112,17 +113,21 @@ class TransportController extends Controller
     public function genererBonTransport($id)
     {
         $transport = Transport::with('cargaisons')->findOrFail($id);
-
         $pdf = Pdf::loadView('back_end.logistique.PDF', compact('transport'));
-
         $fileName = 'bon_transport_'.$transport->id_transport.'.pdf';
 
         Storage::disk('public')->makeDirectory('bons');
 
         Storage::disk('public')->put('bons/'.$fileName, $pdf->output());
 
-
-
         return $pdf->download($fileName);
+    }
+
+    public function  listePDF()
+    {
+        $files =Storage::disk('public')->files('bons');
+        return view('back_end.logistique.liste_pdf', compact('files'));
+
+
     }
 }

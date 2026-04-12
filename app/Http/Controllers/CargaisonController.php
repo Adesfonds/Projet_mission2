@@ -60,7 +60,7 @@ class CargaisonController extends Controller
             'date_arrivee' => null,
             'destination' => 'À définir',
             'statut_transport' => 'En transport',
-            'id_cargaison' => $cargaison->id_cargaison, // <-- lien direct
+
         ]);
 
         // Met à jour la cargaison
@@ -76,7 +76,7 @@ class CargaisonController extends Controller
      */
     public function mettreEnStockage($id_transport)
     {
-        $transport = Transport::with('cargaison')->findOrFail($id_transport);
+        $transport = Transport::with('cargaisons')->findOrFail($id_transport);
 
         if ($transport->statut_transport !== 'En transport') {
             return redirect()->back()->with('error', 'Ce transport ne peut pas être mis en stockage.');
@@ -86,7 +86,7 @@ class CargaisonController extends Controller
         $transport->date_arrivee = now();
         $transport->save();
 
-        $cargaison = $transport->cargaison;
+        $cargaison = $transport->cargaisons();
         if ($cargaison) {
             $cargaison->statut = 'Stocké';
             $cargaison->save();

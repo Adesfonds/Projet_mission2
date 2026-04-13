@@ -69,7 +69,6 @@
     </style>
 </head>
 <body>
-
 <!-- HEADER -->
 <div class="header">
     <h1>BON DE TRANSPORT</h1>
@@ -101,6 +100,7 @@
         <th>Statut</th>
     </tr>
     </thead>
+
     @foreach($transport->cargaisons as $cargaison)
         <tr>
             <td>{{ $cargaison->id_cargaison }}</td>

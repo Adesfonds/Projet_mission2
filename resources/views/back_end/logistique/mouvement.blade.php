@@ -58,10 +58,12 @@
 
                         {{-- Bouton pour mettre en stockage --}}
                         @if($cargaison->statut == 'En transport' && $cargaison->transport)
-                            <form action="{{ route('transports.arrive', $cargaison->transport->id) }}" method="POST" class="mt-1">
+                            <form action="{{ route('transports.arrive', $cargaison->transport->id_transport) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
-                                <button class="btn btn-sm btn-success">Mettre en stockage</button>
+                                <button class="btn btn-success btn-sm">
+                                    Mettre en stockage
+                                </button>
                             </form>
                         @endif
                     </td>

@@ -25,9 +25,6 @@
         <table class="table table-bordered table-striped table-hover">
             <thead class="table-dark text-center">
             <tr>
-                <th>ID Cargaison</th>
-                <th>Volume (t)</th>
-                <th>Site</th>
                 <th>Destination</th>
                 <th>Date départ</th>
                 <th>Date arrivée</th>
@@ -37,9 +34,6 @@
             <tbody class="text-center">
             @forelse($transports as $transport)
                 <tr>
-                    <td>{{ $transport->cargaison->id_cargaison ?? '—' }}</td>
-                    <td>{{ $transport->cargaison->volume ?? '—' }}</td>
-                    <td>{{ $transport->cargaison->site->nom ?? '—' }}</td>
                     <td>{{ $transport->destination }}</td>
                     <td>{{ $transport->date_depart }}</td>
                     <td>{{ $transport->date_arrivee ?? '—' }}</td>

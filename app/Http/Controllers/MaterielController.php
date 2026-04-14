@@ -17,7 +17,7 @@ class MaterielController extends Controller
         // On récupère spécifiquement les éléments en alerte pour le tableau de bord
         $alertes = Materiel::whereColumn('stock', '<=', 'seuil_alerte')->get();
 
-        return view('back_end.stock.stock', compact('materiels', 'alertes'));
+        return view('back_end.stock.inventaire_materiel', compact('materiels', 'alertes'));
     }
 
     /**

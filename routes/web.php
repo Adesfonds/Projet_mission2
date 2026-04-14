@@ -83,8 +83,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', fn() => view('back_end.logistique.logistique'))->name('logistique');
 
         // Stock
-        Route::get('/stock', [MaterielController::class, 'index'])->name('stock');
+        Route::get('/stock', fn() => view('back_end.stock.stock'))->name('stock');
+
+
+        Route::get('/stock/inventaire', [MaterielController::class, 'index'])->name('stock.index');
+
+
         Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('materiel.show');
+
         Route::post('/stock/update/{id}', [MaterielController::class, 'updateStock'])->name('stock.update');
     });
 

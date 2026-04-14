@@ -5,5 +5,18 @@
         </h2>
     </x-slot>
 
+    {{-- Menu simple Mouvements / Suivi --}}
+    <div class="bg-white shadow mb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-4 py-3">
+                <a href="{{ route('stock.index') }}"
+                   class="px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('stock.index') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-200' }}">
+                    Inventaire de materiel
+                </a>
+
+            </nav>
+        </div>
+    </div>
+
 
 </x-app-layout>

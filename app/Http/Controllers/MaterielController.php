@@ -8,32 +8,40 @@ use App\Models\Materiel;
 class MaterielController extends Controller
 {
     /**
-     * INVENTAIRE NUMÉRIQUE
-     * Affiche tout le matériel avec mise en évidence des stocks bas.
+     * INVENTAIRE
      */
     public function index()
     {
         $materiels = Materiel::all();
-        // On récupère spécifiquement les éléments en alerte pour le tableau de bord
         $alertes = Materiel::whereColumn('stock', '<=', 'seuil_alerte')->get();
 
         return view('back_end.stock.inventaire_materiel', compact('materiels', 'alertes'));
     }
+    /**
+     * SUPPRESSION MATERIEL
+     */
+    public function delete($id)
+    {
+        $materiel = Materiel::findOrFail($id);
+        $materiel->delete();
+
+        return redirect()->back()
+            ->with('success', 'Matériel supprimé avec succès');
+    }
 
     /**
-     * ENREGISTREMENT D'UNE SORTIE/ENTRÉE DE STOCK
-     * Remplace la fiche papier du hangar.
+     * MOUVEMENT DE STOCK
      */
-    public function updateStock(Request $request, string $id)
+    public function updateStock(Request $request, $id)
     {
         $materiel = Materiel::findOrFail($id);
 
         $request->validate([
-            'quantite' => 'required|integer',
+            'quantite' => 'required|integer|min:1',
             'type' => 'required|in:entree,sortie'
         ]);
 
-        if ($request->type == 'sortie') {
+        if ($request->type === 'sortie') {
             $materiel->stock -= $request->quantite;
         } else {
             $materiel->stock += $request->quantite;
@@ -41,16 +49,11 @@ class MaterielController extends Controller
 
         $materiel->save();
 
-        // Plus-value : Vérification automatique du seuil après mouvement
-        if ($materiel->stock <= $materiel->seuil_alerte) {
-            // Ici, Laravel pourrait envoyer un mail automatique au service logistique
-        }
-
         return redirect()->back()->with('success', 'Stock mis à jour.');
     }
 
     /**
-     * CRÉATION D'UN NOUVEL OUTIL
+     * CREATION MATERIEL
      */
     public function store(Request $request)
     {
@@ -63,12 +66,36 @@ class MaterielController extends Controller
 
         Materiel::create($validated);
 
-        return redirect()->route('materiel.index')->with('success', 'Nouvel outil inventorié.');
+        return redirect()->route('materiel.index')
+            ->with('success', 'Matériel ajouté avec succès.');
     }
 
-    public function show(string $id)
+    /**
+     * AFFICHAGE DETAIL
+     */
+    public function show($id)
     {
-        $materiel = Materiel::with('commandes')->findOrFail($id);
-        return view('back.materiel.show', compact('materiel'));
+        $materiel = Materiel::findOrFail($id);
+
+        return view('back_end.stock.modif', compact('materiel'));
+    }
+    /**
+     * UPDATE MATERIEL (CORRIGE)
+     */
+    public function update(Request $request, $id)
+    {
+        $materiel = Materiel::findOrFail($id);
+
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'stock' => 'required|integer',
+            'seuil_alerte' => 'required|integer'
+        ]);
+
+        $materiel->update($validated);
+
+        return redirect()->back()
+            ->with('success', 'Matériel mis à jour avec succès.');
     }
 }

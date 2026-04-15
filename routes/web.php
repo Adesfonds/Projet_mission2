@@ -78,22 +78,16 @@ Route::middleware(['auth'])->group(function () {
         return view('back_end.journalisation.journal', compact('logs'));
     })->name('journal');
 
-    // Logistique & Stock
     Route::prefix('logistique')->group(function () {
+
         Route::get('/', fn() => view('back_end.logistique.logistique'))->name('logistique');
-
-        // Stock
         Route::get('/stock', fn() => view('back_end.stock.stock'))->name('stock');
-
-
         Route::get('/stock/inventaire', [MaterielController::class, 'index'])->name('stock.index');
-
-
-        Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('materiel.show');
-
+        Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('stock.show');
         Route::post('/stock/update/{id}', [MaterielController::class, 'updateStock'])->name('stock.update');
+        Route::post('/stock/store', [MaterielController::class, 'store'])->name('stock.store');
+        Route::delete('/stock/{id}', [MaterielController::class, 'delete'])->name('stock.delete');
     });
-
     Route::prefix('mouvements')->group(function () {
 
         // Cargaisons

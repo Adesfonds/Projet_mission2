@@ -89,7 +89,6 @@ class MaterielController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
-            'stock' => 'required|integer',
             'seuil_alerte' => 'required|integer'
         ]);
 

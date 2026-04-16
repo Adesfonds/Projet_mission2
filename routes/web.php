@@ -84,9 +84,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/stock', fn() => view('back_end.stock.stock'))->name('stock');
         Route::get('/stock/inventaire', [MaterielController::class, 'index'])->name('stock.index');
         Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('stock.show');
-        Route::post('/stock/update/{id}', [MaterielController::class, 'updateStock'])->name('stock.update');
+        Route::put('/stock/{id}', [MaterielController::class, 'update'])->name('stock.update');
         Route::post('/stock/store', [MaterielController::class, 'store'])->name('stock.store');
         Route::delete('/stock/{id}', [MaterielController::class, 'delete'])->name('stock.delete');
+
+        Route::get('/mouvements', [MouvementStockController::class, 'index'])->name('mouvements.index');
+        Route::post('/stock/entree/{id}', [MouvementStockController::class, 'entree'])->name('stock.entree');
+        Route::post('/stock/sortie/{id}', [MouvementStockController::class, 'sortie'])->name('stock.sortie');
     });
     Route::prefix('mouvements')->group(function () {
 

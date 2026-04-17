@@ -1,6 +1,7 @@
 <!-- resources/views/includes/menu.blade.php -->
 
 <!-- Accueil -->
+<div class="menu">
 <a href="{{ url('') }}" class="btn">Accueil</a>
 
 
@@ -34,3 +35,4 @@
     <option value="{{ url('rapport/trimestriel') }}">Rapports trimestriels</option>
     <option value="{{ url('rapport/archive') }}">Archives</option>
 </select>
+</div>

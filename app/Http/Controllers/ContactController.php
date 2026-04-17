@@ -23,13 +23,12 @@ class ContactController extends Controller
             'message' => 'required|string',
         ]);
 
-        // Optionnel : envoyer un email
-        /*
-        Mail::send('emails.contact', $request->all(), function($message) use ($request){
-            $message->to('tonemail@example.com')
+        Mail::send('Front-end.contact.contact', $request->all(), function($message) use ($request){
+            $message->to('vem2026@outlook.fr')
                     ->subject($request->subject);
         });
-        */
+
+
 
         return back()->with('success', 'Merci pour votre message !');
     }

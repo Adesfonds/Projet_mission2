@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Collecte;
 use App\Models\Mesure;
 use Illuminate\Http\Request;
 
@@ -92,5 +93,14 @@ class MesureController extends Controller
         return response()->json([
             'message' => 'Mesure supprimée'
         ]);
+    }
+    public function byCapteur($id_capt)
+    {
+        return response()->json(
+            Collecte::with('mesure')
+                ->where('id_capt', $id_capt)
+                ->get()
+                ->pluck('mesure')
+        );
     }
 }

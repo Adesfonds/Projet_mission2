@@ -22,7 +22,7 @@ Route::delete('/mesures/{id}', [MesureController::class, 'destroy']);
 Route::get('/collecte', [CollecteController::class, 'index']);
 Route::post('/collecte', [CollecteController::class, 'store']);
 Route::delete('/collecte/{id_capt}/{id_mesure}', [CollecteController::class, 'destroy']);
-
+Route::get('/mesures/capteur/{id_capt}', [MesureController::class, 'byCapteur']);
 Route::get('/ping', function () {
     return response()->json(['ok' => true]);
 });

@@ -10,16 +10,22 @@ class MaterielController extends Controller
     /**
      * INVENTAIRE
      */
-    public function index()
+    public function index(Request $request)
     {
-        $materiels = Materiel::all();
+        $query = Materiel::query();
+
+        if ($request->filled('search')) {
+            $query->where('nom', 'like', '%' . $request->search . '%')
+                ->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+
+        $materiels = $query->get();
+
         $alertes = Materiel::whereColumn('stock', '<=', 'seuil_alerte')->get();
 
         return view('back_end.stock.inventaire_materiel', compact('materiels', 'alertes'));
     }
-    /**
-     * SUPPRESSION MATERIEL
-     */
+
     public function delete($id)
     {
         $materiel = Materiel::findOrFail($id);
@@ -66,8 +72,12 @@ class MaterielController extends Controller
 
         Materiel::create($validated);
 
-        return redirect()->route('materiel.index')
+        return redirect()->route('stock.index')
             ->with('success', 'Matériel ajouté avec succès.');
+    }
+    public function create()
+    {
+        return view('back_end.stock.creat_mat');
     }
 
     /**

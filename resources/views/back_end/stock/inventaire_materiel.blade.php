@@ -3,6 +3,25 @@
 
         <h2 class="text-xl font-bold mb-4">Inventaire des matériels</h2>
 
+        <form method="GET" action="{{ route('stock.index') }}" class="mb-4">
+            <input
+                type="text"
+                name="search"
+                placeholder="Rechercher un matériel..."
+                value="{{ request('search') }}"
+                class="border p-2 w-full"
+            >
+
+            <button type="submit" class="mt-2 bg-blue-600 text-white px-4 py-2">
+                Rechercher
+            </button>
+        </form>
+
+        <a href="{{ route('stock.create') }}"
+           class="text-blue-600">
+            Créer
+        </a>
+
         <table class="table-auto w-full border border-gray-300">
             <thead class="bg-gray-100">
             <tr>

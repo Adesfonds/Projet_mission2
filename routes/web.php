@@ -16,6 +16,7 @@ use App\Models\Log;
 use Illuminate\Support\Facades\Route;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | FRONT-END ROUTES
@@ -101,8 +102,33 @@ Route::middleware(['auth'])->group(function () {
             ->name('stock.delete');
 
         Route::get('/mouvements', [MouvementStockController::class, 'index'])->name('mouvements.index');
-        Route::post('/stock/entree/{id}', [MouvementStockController::class, 'entree'])->name('stock.entree');
-        Route::post('/stock/sortie/{id}', [MouvementStockController::class, 'sortie'])->name('stock.sortie');
+        Route::post('/stock/{id}/entree', [MouvementStockController::class, 'entree'])->name('stock.entree');
+        Route::post('/stock/{id}/sortie', [MouvementStockController::class, 'sortie'])->name('stock.sortie');
+
+        Route::get('/commandes', [CommandeController::class, 'index'])->name('commandes.index');
+        Route::get('/commandes/{id}', [CommandeController::class, 'show'])->name('commandes.show');
+
+
+    });
+
+    Route::prefix('commandes')->middleware(['auth'])->group(function () {
+
+        // Liste des commandes
+        Route::get('/', [CommandeController::class, 'index'])
+            ->name('commandes.index');
+
+        // Formulaire création commande
+        Route::get('/create', [CommandeController::class, 'create'])
+            ->name('commandes.create');
+
+        // Enregistrer commande
+        Route::post('/', [CommandeController::class, 'store'])
+            ->name('commandes.store');
+
+        // Mise à jour statut (réception / livraison)
+        Route::put('/{id}', [CommandeController::class, 'update'])
+            ->name('commandes.update');
+
     });
     Route::prefix('mouvements')->group(function () {
 

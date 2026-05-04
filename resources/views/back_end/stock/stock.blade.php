@@ -18,5 +18,18 @@
         </div>
     </div>
 
+    <div class="bg-white shadow mb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-4 py-3">
+                <a href="{{ route('mouvements.index') }}"
+                   class="px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('mouvements.index') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-200' }}">
+                    Suivi des entrées
+                </a>
+
+            </nav>
+        </div>
+    </div>
+
+
 
 </x-app-layout>

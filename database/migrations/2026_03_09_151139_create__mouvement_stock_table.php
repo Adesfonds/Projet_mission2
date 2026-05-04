@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('mouvement_stock', function (Blueprint $table) {
             $table->id('id_mouvement');               // clé primaire
-            $table->foreignId('id_uti')->constrained('utilisateur_'); // utilisateur qui effectue le mouvement
+            $table->foreignId('id_uti')->constrained('users'); // utilisateur qui effectue le mouvement
             $table->foreignId('id_materiel')->constrained('materiel'); // matériel concerné
             $table->dateTime('date_mouvement');       // date du mouvement
             $table->string('type_mouvement', 20);     // entrée ou sortie

@@ -26,9 +26,5 @@
             </button>
         </form>
 
-        <a href="{{ route('stock.index') }}" class="text-blue-600 mt-4 inline-block">
-            ← Retour à l’inventaire
-        </a>
-
     </div>
 </x-app-layout>

@@ -6,75 +6,93 @@ use Illuminate\Http\Request;
 use App\Models\Commande;
 use App\Models\Fournisseur;
 use App\Models\Materiel;
+use Illuminate\Support\Facades\DB;
 
 class CommandeController extends Controller
 {
     /**
-     * SUIVI DES APPROVISIONNEMENTS
-     * Remplace le manque de procédure automatisée.
+     * LISTE COMMANDES
      */
     public function index()
     {
-        // On récupère les commandes avec le nom du fournisseur
-        $commandes = Commande::with('fournisseur')->orderBy('date_commande', 'desc')->get();
-        return view('back.commandes.index', compact('commandes'));
+        $commandes = Commande::with('fournisseur')
+            ->orderByDesc('date_commande')
+            ->get();
+
+        return view('back_end.stock.suivre_commande', compact('commandes'));
     }
 
     /**
-     * Formulaire de commande
+     * FORMULAIRE
      */
     public function create()
     {
-        $fournisseurs = Fournisseur::all();
-        $materiels = Materiel::all();
-        return view('back.commandes.create', compact('fournisseurs', 'materiels'));
+        return view('back.commandes.create', [
+            'fournisseurs' => Fournisseur::all(),
+            'materiels' => Materiel::all()
+        ]);
     }
 
     /**
-     * PASSAGE DE COMMANDE NUMÉRIQUE
-     * Enregistre la commande et lie les produits via la table pivot
+     * CREER COMMANDE
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'id_fournisseur' => 'required|exists:fournisseur,id_fournisseur',
-            'status_commande' => 'required|string',
-            'materiels' => 'required|array', // Tableau d'ID de matériel
+            'materiels' => 'required|array'
         ]);
 
-        // 1. Création de la commande
-        $commande = Commande::create([
-            'date_commande' => now(),
-            'status_commande' => $request->status_commande,
-            'id_fournisseur' => $request->id_fournisseur,
-        ]);
+        DB::transaction(function () use ($request) {
 
-        // 2. Liaison avec le matériel (Table "contenir" ou pivot)
-        // On imagine que tu passes aussi une quantité pour chaque matériel
-        foreach ($request->materiels as $id_mat => $details) {
-            $commande->materiels()->attach($id_mat, ['quantite' => $details['qte']]);
-        }
+            // 1. Création commande
+            $commande = Commande::create([
+                'date_commande' => now(),
+                'statut_commande' => 'en_attente',
+                'id_fournisseur' => $request->id_fournisseur
+            ]);
 
-        return redirect()->route('commandes.index')->with('success', 'Commande fournisseur enregistrée.');
+            // 2. Ajout matériels
+            foreach ($request->materiels as $id => $data) {
+
+                if (!empty($data['quantite'])) {
+                    $commande->materiels()->attach($id, [
+                        'quantite' => (int) $data['quantite']
+                    ]);
+                }
+            }
+        });
+
+        return redirect()->route('commandes.index')
+            ->with('success', 'Commande créée avec succès');
     }
 
     /**
-     * RÉCEPTION DE COMMANDE
-     * Met à jour le statut et incrémente automatiquement le stock matériel
+     * RECEPTION COMMANDE
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        $commande = Commande::findOrFail($id);
+        $commande = Commande::with('materiels')->findOrFail($id);
 
-        // Si la commande passe à "Livrée", on met à jour les stocks de la foreuse
-        if ($request->status_commande == 'Livrée' && $commande->status_commande != 'Livrée') {
-            foreach ($commande->materiels as $materiel) {
-                $materiel->increment('stock', $materiel->pivot->quantite);
+        $nouveauStatut = $request->statut_commande;
+
+        DB::transaction(function () use ($commande, $nouveauStatut) {
+
+            // Si passage à livrée
+            if (
+                $nouveauStatut === 'livree'
+                && $commande->statut_commande !== 'livree'
+            ) {
+                foreach ($commande->materiels as $materiel) {
+                    $materiel->increment('stock', $materiel->pivot->quantite);
+                }
             }
-        }
 
-        $commande->update(['status_commande' => $request->status_commande]);
+            $commande->update([
+                'statut_commande' => $nouveauStatut
+            ]);
+        });
 
-        return redirect()->back()->with('success', 'Statut mis à jour et stocks actualisés.');
+        return back()->with('success', 'Commande mise à jour');
     }
 }

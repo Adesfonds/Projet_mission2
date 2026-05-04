@@ -19,7 +19,7 @@ $table->string('statut', 50);              // statut (ex: extrait, transporté)
 // Relations
 $table->foreignId('id_transport')->nullable()->constrained('transport');
 $table->foreignId('id_site')->constrained('sites');
-$table->foreignId('id_uti')->constrained('utilisateur_');
+$table->foreignId('id_uti')->constrained('users');
 
 $table->timestamps();                       // created_at & updated_at
 });

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class CommandeController extends Controller
 {
     /**
-     * LISTE COMMANDES
+     * LISTE DES COMMANDES (SUIVI)
      */
     public function index()
     {
@@ -23,18 +23,18 @@ class CommandeController extends Controller
     }
 
     /**
-     * FORMULAIRE
+     * FORMULAIRE DE CREATION
      */
     public function create()
     {
-        return view('back.commandes.create', [
+        return view('back_end.stock.passer_commande', [
             'fournisseurs' => Fournisseur::all(),
             'materiels' => Materiel::all()
         ]);
     }
 
     /**
-     * CREER COMMANDE
+     * ENREGISTRER UNE COMMANDE
      */
     public function store(Request $request)
     {
@@ -45,14 +45,12 @@ class CommandeController extends Controller
 
         DB::transaction(function () use ($request) {
 
-            // 1. Création commande
             $commande = Commande::create([
                 'date_commande' => now(),
                 'statut_commande' => 'en_attente',
                 'id_fournisseur' => $request->id_fournisseur
             ]);
 
-            // 2. Ajout matériels
             foreach ($request->materiels as $id => $data) {
 
                 if (!empty($data['quantite'])) {
@@ -68,7 +66,7 @@ class CommandeController extends Controller
     }
 
     /**
-     * RECEPTION COMMANDE
+     * MISE A JOUR STATUT + STOCK
      */
     public function update(Request $request, $id)
     {
@@ -78,7 +76,6 @@ class CommandeController extends Controller
 
         DB::transaction(function () use ($commande, $nouveauStatut) {
 
-            // Si passage à livrée
             if (
                 $nouveauStatut === 'livree'
                 && $commande->statut_commande !== 'livree'

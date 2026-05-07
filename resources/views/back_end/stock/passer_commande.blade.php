@@ -1,46 +1,55 @@
 <x-app-layout>
     <div class="p-6">
 
-        <h1 class="text-xl font-bold mb-4">Commandes fournisseurs</h1>
+        <h1 class="text-xl font-bold mb-4">Passer une commande fournisseur</h1>
 
-        <a href="{{ route('commandes.create') }}" class="text-blue-600">
-            + Nouvelle commande
-        </a>
+        <form method="POST" action="{{ route('commandes.store') }}">
+            @csrf
 
-        <table class="w-full mt-4 border">
-            <thead>
-            <tr>
-                <th>Fournisseur</th>
-                <th>Date</th>
-                <th>Statut</th>
-                <th>Action</th>
-            </tr>
-            </thead>
+            {{-- Fournisseur --}}
+            <div class="mb-4">
+                <label class="block font-semibold">Fournisseur</label>
 
-            <tbody>
-            @foreach($commandes as $commande)
-                <tr>
-                    <td>{{ $commande->fournisseur->nom }}</td>
-                    <td>{{ $commande->date_commande }}</td>
-                    <td>{{ $commande->statut_commande }}</td>
+                <select name="id_fournisseur" class="border p-2 w-full" required>
+                    <option value="">-- Choisir un fournisseur --</option>
 
-                    <td>
-                        <form method="POST"
-                              action="{{ route('commandes.update', $commande->id_commande) }}">
-                            @csrf
+                    @foreach($fournisseurs as $fournisseur)
+                        <option value="{{ $fournisseur->id_fournisseur }}">
+                            {{ $fournisseur->nom }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-                            <select name="statut_commande">
-                                <option value="en_attente">En attente</option>
-                                <option value="livree">Livrée</option>
-                            </select>
+            {{-- Matériels --}}
+            <h2 class="text-lg font-bold mt-6 mb-2">Matériels</h2>
 
-                            <button class="text-green-600">OK</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
+            <div class="border p-4 rounded">
+                @foreach($materiels as $materiel)
+                    <div class="flex items-center gap-4 mb-2">
+                    <select>
+                        <option class="w-1/2">
+                            {{ $materiel->description }}
+                        </option>
+                    </select>
+                        <input type="number"
+                               min="0"
+                               name="materiels[{{ $materiel->id_materiel }}][quantite]"
+                               placeholder="Quantité"
+                               class="border p-1 w-32">
+
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- Bouton --}}
+            <div class="mt-6">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                    Créer la commande
+                </button>
+            </div>
+
+        </form>
 
     </div>
 </x-app-layout>

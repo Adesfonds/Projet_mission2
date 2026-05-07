@@ -21,7 +21,11 @@ class Commande extends Model
     // Relation avec le fournisseur
     public function fournisseur()
     {
-        return $this->belongsTo(Fournisseur::class, 'id_fournisseur');
+        return $this->belongsTo(
+            Fournisseur::class,
+            'id_fournisseur',
+            'id_fournisseur'
+        );
     }
 
     // Relation avec les matériels via la table pivot "contenir"

@@ -105,8 +105,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/stock/{id}/entree', [MouvementStockController::class, 'entree'])->name('stock.entree');
         Route::post('/stock/{id}/sortie', [MouvementStockController::class, 'sortie'])->name('stock.sortie');
 
-        Route::get('/commandes', [CommandeController::class, 'index'])->name('commandes.index');
-        Route::get('/commandes/{id}', [CommandeController::class, 'show'])->name('commandes.show');
+
 
 
     });

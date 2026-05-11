@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\CapteurController;
+use App\Http\Controllers\CollecteController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\MesureController;
 use App\Http\Controllers\MouvementStockController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReleveTerrainController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MaterielController;
@@ -14,8 +18,6 @@ use App\Http\Controllers\MineraisController;
 use App\Http\Controllers\SiteController;
 use App\Models\Log;
 use Illuminate\Support\Facades\Route;
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -68,79 +70,114 @@ Route::prefix('rapport')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| BACK-END ROUTES (auth)
+| FRONT-END ROUTES
 |--------------------------------------------------------------------------
 */
+
+Route::get('/', fn() => view('page_accueil'));
+
+Route::get('/dashboard', fn() => view('dashboard'))
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::prefix('presentation')->group(function () {
+    Route::get('/entreprise', fn() => view('Front-end.presentation.entreprise'));
+    Route::get('/equipe', fn() => view('Front-end.presentation.equipe'));
+    Route::get('/histoire', fn() => view('Front-end.presentation.histoire'));
+});
+
+Route::prefix('partenariats')->group(function () {
+    Route::get('/demandes', fn() => view('Front-end.partenariats.demande_partenaire'));
+    Route::get('/nos', fn() => view('Front-end.partenariats.nos_partenaire'));
+});
+
+Route::get('/contact', [ContactController::class, 'index']);
+Route::post('/contact', [ContactController::class, 'send']);
+
+Route::get('/actualites', fn() => view('Front-end.actualite.list_actualite'));
+
+Route::prefix('activites')->group(function () {
+    Route::get('/administration', fn() => view('activites.administration'));
+    Route::get('/extraction', fn() => view('activites.extraction'));
+    Route::get('/logistique', fn() => view('activites.logistique'));
+    Route::get('/recherche', fn() => view('activites.recherche'));
+});
+
+Route::prefix('rapport')->group(function () {
+    Route::get('/archive', fn() => view('rapports.archive'));
+    Route::get('/mensuels', fn() => view('rapports.rapport_mensuels'));
+    Route::get('/trimestriel', fn() => view('rapports.rapport_trimestriel'));
+});
+
+/*
+|--------------------------------------------------------------------------
+| BACK-END ROUTES (SECURISÉES PAR RÔLES)
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware(['auth'])->group(function () {
 
-    // Journalisation
-    Route::get('/journalisation', function () {
-        $logs = Log::orderBy('created_at', 'desc')->paginate(20);
-        return view('back_end.journalisation.journal', compact('logs'));
-    })->name('journal');
+    /*
+    |---------------------------
+    | JOURNALISATION (1,2,4)
+    |---------------------------
+    */
+    Route::middleware(['role:1,2,4'])->group(function () {
+        Route::get('/journalisation', function () {
+            $logs = Log::orderBy('created_at', 'desc')->paginate(20);
+            return view('back_end.journalisation.journal', compact('logs'));
+        })->name('journal');
+    });
 
-    Route::prefix('logistique')->group(function () {
+    /*
+    |---------------------------
+    | LOGISTIQUE / STOCK (1,2,3,5,8)
+    |---------------------------
+    */
+    Route::middleware(['role:1,2,3,5,8'])->prefix('logistique')->group(function () {
 
         Route::get('/', fn() => view('back_end.logistique.logistique'))->name('logistique');
         Route::get('/stock', fn() => view('back_end.stock.stock'))->name('stock');
-        Route::get('/stock/inventaire', [MaterielController::class, 'index'])
-            ->name('stock.index');
 
-        Route::get('/stock/create', [MaterielController::class, 'create'])
-            ->name('stock.create');
-
-        Route::post('/stock/store', [MaterielController::class, 'store'])
-            ->name('stock.store');
-
-        Route::get('/stock/{id}', [MaterielController::class, 'show'])
-            ->name('stock.show');
-
-        Route::put('/stock/{id}', [MaterielController::class, 'update'])
-            ->name('stock.update');
-
-        Route::delete('/stock/{id}', [MaterielController::class, 'delete'])
-            ->name('stock.delete');
+        Route::get('/stock/inventaire', [MaterielController::class, 'index'])->name('stock.index');
+        Route::get('/stock/create', [MaterielController::class, 'create'])->name('stock.create');
+        Route::post('/stock/store', [MaterielController::class, 'store'])->name('stock.store');
+        Route::get('/stock/{id}', [MaterielController::class, 'show'])->name('stock.show');
+        Route::put('/stock/{id}', [MaterielController::class, 'update'])->name('stock.update');
+        Route::delete('/stock/{id}', [MaterielController::class, 'delete'])->name('stock.delete');
 
         Route::get('/mouvements', [MouvementStockController::class, 'index'])->name('mouvements.index');
         Route::post('/stock/{id}/entree', [MouvementStockController::class, 'entree'])->name('stock.entree');
         Route::post('/stock/{id}/sortie', [MouvementStockController::class, 'sortie'])->name('stock.sortie');
-
-
-
-
     });
 
-    Route::prefix('commandes')->middleware(['auth'])->group(function () {
+    /*
+    |---------------------------
+    | COMMANDES (1,2,3,5,8)
+    |---------------------------
+    */
+    Route::middleware(['role:1,2,3,5,8'])->prefix('commandes')->group(function () {
 
-        // Liste des commandes
-        Route::get('/', [CommandeController::class, 'index'])
-            ->name('commandes.index');
-
-        // Formulaire création commande
-        Route::get('/create', [CommandeController::class, 'create'])
-            ->name('commandes.create');
-
-        // Enregistrer commande
-        Route::post('/', [CommandeController::class, 'store'])
-            ->name('commandes.store');
-
-        // Mise à jour statut (réception / livraison)
-        Route::put('/{id}', [CommandeController::class, 'update'])
-            ->name('commandes.update');
-
+        Route::get('/', [CommandeController::class, 'index'])->name('commandes.index');
+        Route::get('/create', [CommandeController::class, 'create'])->name('commandes.create');
+        Route::post('/', [CommandeController::class, 'store'])->name('commandes.store');
+        Route::put('/{id}', [CommandeController::class, 'update'])->name('commandes.update');
     });
-    Route::prefix('mouvements')->group(function () {
 
-        // Cargaisons
+    /*
+    |---------------------------
+    | MOUVEMENTS (1,2,3,5,8)
+    |---------------------------
+    */
+    Route::middleware(['role:1,2,3,5,8'])->prefix('mouvements')->group(function () {
+
         Route::get('/cargaisons', [CargaisonController::class, 'index'])->name('cargaisons.index');
         Route::get('/cargaisons/create', [CargaisonController::class, 'create'])->name('cargaisons.create');
         Route::post('/cargaisons', [CargaisonController::class, 'store'])->name('cargaisons.store');
 
-        // Nouvelles routes pour changer le statut
         Route::post('/cargaisons/{id}/transport', [CargaisonController::class, 'mettreEnTransport'])->name('cargaisons.transport');
         Route::post('/cargaisons/{id}/stockage', [CargaisonController::class, 'mettreEnStockage'])->name('cargaisons.stockage');
 
-        // Transports
         Route::get('/transports', [TransportController::class, 'index'])->name('transports.index');
         Route::post('/transports', [TransportController::class, 'store'])->name('transports.store');
         Route::put('/transports/{id}', [TransportController::class, 'update'])->name('transports.update');
@@ -148,24 +185,49 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/transports/{id}/arrive', [TransportController::class, 'arrive'])->name('transports.arrive');
 
         Route::get('/transports/bon/{id}', [TransportController::class, 'genererBonTransport'])->name('bons.transport');
-        // Télécharger un bons de mouvement
+
         Route::get('/stock/bons/{id}', [MouvementStockController::class, 'show'])->name('mouvements.stock.bons');
 
-        Route::get('/listePDF', [TransportController::class, 'listePDF'])
-            ->name('logistique.liste_pdf');
+        Route::get('/listePDF', [TransportController::class, 'listePDF'])->name('logistique.liste_pdf');
     });
 
-    // Relevés de terrain
-    Route::get('/releves-terrain', fn() => view('back_end.releve_terrain.releves_terrain'))
-        ->name('releves_terrain');
+    /*
+    |---------------------------
+    | RELEVÉS TERRAIN (1-7)
+    |---------------------------
+    */
+    Route::middleware(['role:1,2,3,4,5,6,7'])->group(function () {
 
-    // Gestion des utilisateurs
-    Route::get('/utilisateur-gestion', [UserController::class, 'index'])->name('gestion_utilisateur');
-    Route::post('/utilisateur', [UserController::class, 'store'])->name('users.store');
-    Route::delete('/utilisateur/{id}', [UserController::class, 'delete'])->name('users.delete');
-    Route::put('/utilisateur/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::get('/capteurs', [CapteurController::class, 'index'])->name('capteurs.index');
+        Route::get('/capteurs/{id}', [CapteurController::class, 'show'])->name('capteurs.show');
 
-    // Profile utilisateur
+        Route::get('/mesures', [MesureController::class, 'index'])->name('mesures.index');
+        Route::get('/mesures/{id}', [MesureController::class, 'show'])->name('mesures.show');
+
+        Route::get('/collectes', [CollecteController::class, 'index'])->name('collectes.index');
+        Route::get('/collectes/{id_capt}/{id_mesure_}', [CollecteController::class, 'show'])->name('collectes.show');
+
+        Route::get('/releves-terrain', [ReleveTerrainController::class, 'index'])->name('releves_terrain');
+    });
+
+    /*
+    |---------------------------
+    | UTILISATEURS (1,2)
+    |---------------------------
+    */
+    Route::middleware(['role:1,2'])->group(function () {
+
+        Route::get('/utilisateur-gestion', [UserController::class, 'index'])->name('gestion_utilisateur');
+        Route::post('/utilisateur', [UserController::class, 'store'])->name('users.store');
+        Route::delete('/utilisateur/{id}', [UserController::class, 'delete'])->name('users.delete');
+        Route::put('/utilisateur/{user}', [UserController::class, 'update'])->name('users.update');
+    });
+
+    /*
+    |---------------------------
+    | PROFILE (tous utilisateurs)
+    |---------------------------
+    */
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');

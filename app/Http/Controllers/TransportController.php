@@ -32,7 +32,7 @@ class TransportController extends Controller
         $validated = $request->validate([
             'cargaison_id' => 'required|exists:cargaison,id_cargaison',
             'date_depart' => 'required|date',
-            'date_arrivee' => 'required|date',
+            'date_arrivee' => 'required|date|after_or_equal:date_depart',
             'destination' => 'required|string',
         ]);
 
@@ -60,7 +60,8 @@ class TransportController extends Controller
         Storage::disk('public')->makeDirectory('bons');
         Storage::disk('public')->put('bons/' . $fileName, $pdf->output());
 
-        return $pdf->download($fileName);
+        return redirect()->route('transports.index')
+            ->with('success', 'Transport créé et PDF généré.');
     }
 
     /**

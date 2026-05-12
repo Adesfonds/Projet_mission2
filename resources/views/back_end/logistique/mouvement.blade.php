@@ -128,6 +128,8 @@
                 <button class="btn btn-primary">Enregistrer l'extraction</button>
             </form>
         </div>
-
+        @error('date_arrivee')
+        <div class="text-danger">{{ $message }}</div>
+        @enderror
     </div>
 </x-app-layout>

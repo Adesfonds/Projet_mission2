@@ -29,6 +29,12 @@ class MaterielController extends Controller
     public function delete($id)
     {
         $materiel = Materiel::findOrFail($id);
+
+        if ($materiel->mouvements()->exists()) {
+            return redirect()->back()
+                ->with('error', 'Impossible de supprimer : matériel utilisé');
+        }
+
         $materiel->delete();
 
         return redirect()->back()

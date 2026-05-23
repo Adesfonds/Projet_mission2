@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Collecte extends Model
 {
-    protected $table = 'Collecte_';
+    protected $table = 'collecte_';
 
     public $incrementing = false;
     public $timestamps = false;

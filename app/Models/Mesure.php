@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mesure extends Model
 {
-    protected $table = 'Mesure_';
+    protected $table = 'mesure_';
     protected $primaryKey = 'id_mesure_';
 
     public $incrementing = false;

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Capteur extends Model
 {
-    protected $table = 'Capteur_';
+    protected $table = 'capteur_';
     protected $primaryKey = 'id_capt';
 
 

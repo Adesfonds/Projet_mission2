@@ -11,41 +11,38 @@ class MesureController extends Controller
     {
         $query = Mesure::query();
 
-        $query->when($request->date, function ($q) {
-            $q->whereDate('horodatage', request('date'));
-        });
+        $query->when($request->date, fn($q) =>
+        $q->where('horodatage', $request->date)
+        );
 
-        $query->when($request->date_debut, function ($q) {
-            $q->where('horodatage', '>=', request('date_debut'));
-        });
+        $query->when($request->date_debut, fn($q) =>
+        $q->where('horodatage', '>=', $request->date_debut)
+        );
 
-        $query->when($request->date_fin, function ($q) {
-            $q->where('horodatage', '<=', request('date_fin'));
-        });
+        $query->when($request->date_fin, fn($q) =>
+        $q->where('horodatage', '<=', $request->date_fin)
+        );
 
-        $query->when($request->unite, function ($q) {
-            $q->where('unite_mesure', request('unite'));
-        });
+        $query->when($request->unite, fn($q) =>
+        $q->where('unite', $request->unite) // ← corrigé
+        );
 
-        $query->when($request->valeur_min, function ($q) {
-            $q->where('valeur', '>=', request('valeur_min'));
-        });
+        $query->when($request->valeur_min, fn($q) =>
+        $q->where('valeur', '>=', $request->valeur_min)
+        );
 
-        $query->when($request->valeur_max, function ($q) {
-            $q->where('valeur', '<=', request('valeur_max'));
-        });
+        $query->when($request->valeur_max, fn($q) =>
+        $q->where('valeur', '<=', $request->valeur_max)
+        );
 
-        $mesures = $query->orderBy('horodatage', 'desc')
-            ->paginate(20);
+        $mesures = $query->orderBy('horodatage', 'desc')->paginate(20);
 
-        $unites = Mesure::query()
-            ->whereNotNull('unite_mesure')
+        $unites = Mesure::whereNotNull('unite')
             ->distinct()
-            ->pluck('unite_mesure');
+            ->pluck('unite'); // ← corrigé
 
         return view('mesures.index', compact('mesures', 'unites'));
     }
-
     public function show(string $id)
     {
         $mesure = Mesure::with('collectes')->findOrFail($id);

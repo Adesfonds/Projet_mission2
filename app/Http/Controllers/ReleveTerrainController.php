@@ -5,48 +5,54 @@ namespace App\Http\Controllers;
 use App\Models\Capteur;
 use App\Models\Mesure;
 use App\Models\Collecte;
-
+use Illuminate\Http\Request;
 class ReleveTerrainController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $capteurs = Capteur::query()
-            ->when(request('type_capteur'), fn($q) =>
-            $q->where('type_capteur', request('type_capteur'))
-            )
-            ->when(request('localisation'), fn($q) =>
-            $q->where('localisation', request('localisation'))
-            )
-            ->when(request('unite'), fn($q) =>
-            $q->where('unite_mesure', request('unite'))
-            )
-            ->paginate(20);
+        // Capteurs filtrés
+        $capteursQuery = Capteur::query();
 
-        $collectes = Collecte::with(['capteur', 'mesure'])
-            ->when(request('type_capteur'), fn($q) =>
-            $q->whereHas('capteur', fn($q2) =>
-            $q2->where('type_capteur', request('type_capteur'))
-            )
-            )
-            ->when(request('unite'), fn($q) =>
-            $q->whereHas('mesure', fn($q2) =>
-            $q2->where('unite_mesure', request('unite'))
-            )
-            )
+        $capteursQuery->when($request->type_capteur, fn($q) =>
+        $q->where('type_capteur', $request->type_capteur)
+        );
+
+        $capteursQuery->when($request->localisation, fn($q) =>
+        $q->where('localisation', $request->localisation)
+        );
+
+        $capteurs = $capteursQuery->get();
+
+        // Collectes filtrées
+        $collectesQuery = Collecte::with('mesure', 'capteur')
+            ->join('capteur_', 'collecte_.id_capt', '=', 'capteur_.id_capt')
+            ->join('mesure_', 'collecte_.id_mesure_', '=', 'mesure_.id_mesure_');
+
+        $collectesQuery->when($request->type_capteur, fn($q) =>
+        $q->where('capteur_.type_capteur', $request->type_capteur)
+        );
+
+        $collectesQuery->when($request->localisation, fn($q) =>
+        $q->where('capteur_.localisation', $request->localisation)
+        );
+
+        $collectesQuery->when($request->date, fn($q) =>
+        $q->where('mesure_.horodatage', $request->date)
+        );
+
+        $collectes = $collectesQuery
+            ->orderBy('mesure_.horodatage', 'desc')
+            ->select('collecte_.*')
             ->paginate(20);
 
         $types = Capteur::distinct()->pluck('type_capteur');
-        $unites = Capteur::distinct()->pluck('unite_mesure');
         $localisations = Capteur::distinct()->pluck('localisation');
-        $fabricants = Capteur::distinct()->pluck('fabricant');
 
         return view('back_end.releve_terrain.releves_terrain', compact(
             'capteurs',
             'collectes',
             'types',
-            'unites',
-            'localisations',
-            'fabricants'
+            'localisations'
         ));
     }
 }

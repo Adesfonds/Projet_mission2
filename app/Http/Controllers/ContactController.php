@@ -7,28 +7,29 @@ use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
-    // Afficher le formulaire
     public function index()
     {
         return view('Front-end.contact.contact');
     }
 
-    // Traiter le formulaire
     public function send(Request $request)
     {
-        // Validation
         $request->validate([
-            'email' => 'required|email',
+            'nom'     => 'required|string|max:255',
+            'email'   => 'required|email',
             'subject' => 'required|string|max:255',
-            'message' => 'required|string',
+            'contenu' => 'required|string', // ← renommé
         ]);
 
-        Mail::send('Front-end.contact.contact', $request->all(), function($message) use ($request){
-            $message->to('vem2026@outlook.fr')
-                    ->subject($request->subject);
-        });
-
-
+        Mail::send(
+            'emails.contact',
+            $request->only('nom', 'email', 'subject', 'contenu'), // ← 'message' renommé en 'contenu'
+            function ($message) use ($request) {
+                $message->to('vem2026@outlook.fr')
+                    ->replyTo($request->email, $request->nom)
+                    ->subject('Contact VEM : ' . $request->subject);
+            }
+        );
 
         return back()->with('success', 'Merci pour votre message !');
     }

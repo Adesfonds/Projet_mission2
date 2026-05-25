@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\CapteurController;
 use App\Http\Controllers\CollecteController;
 use App\Http\Controllers\ContactController;
@@ -51,7 +52,11 @@ Route::get('/contact', [ContactController::class, 'index']);
 Route::post('/contact', [ContactController::class, 'send']);
 
 // Actualités
-Route::get('/actualites', fn() => view('Front-end.actualite.list_actualite'));
+
+Route::prefix('actualites')->name('actualites.')->group(function () {
+    Route::get('/', [ActivityController::class, 'index'])->name('index');
+    Route::get('/{activity}', [ActivityController::class, 'show'])->name('show');
+});
 
 // Activités
 Route::prefix('activites')->group(function () {
@@ -68,46 +73,6 @@ Route::prefix('rapport')->group(function () {
     Route::get('/trimestriel', fn() => view('rapports.rapport_trimestriel'));
 });
 
-/*
-|--------------------------------------------------------------------------
-| FRONT-END ROUTES
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/', fn() => view('page_accueil'));
-
-Route::get('/dashboard', fn() => view('dashboard'))
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-Route::prefix('presentation')->group(function () {
-    Route::get('/entreprise', fn() => view('Front-end.presentation.entreprise'));
-    Route::get('/equipe', fn() => view('Front-end.presentation.equipe'));
-    Route::get('/histoire', fn() => view('Front-end.presentation.histoire'));
-});
-
-Route::prefix('partenariats')->group(function () {
-    Route::get('/demandes', fn() => view('Front-end.partenariats.demande_partenaire'));
-    Route::get('/nos', fn() => view('Front-end.partenariats.nos_partenaire'));
-});
-
-Route::get('/contact', [ContactController::class, 'index']);
-Route::post('/contact', [ContactController::class, 'send']);
-
-Route::get('/actualites', fn() => view('Front-end.actualite.list_actualite'));
-
-Route::prefix('activites')->group(function () {
-    Route::get('/administration', fn() => view('activites.administration'));
-    Route::get('/extraction', fn() => view('activites.extraction'));
-    Route::get('/logistique', fn() => view('activites.logistique'));
-    Route::get('/recherche', fn() => view('activites.recherche'));
-});
-
-Route::prefix('rapport')->group(function () {
-    Route::get('/archive', fn() => view('rapports.archive'));
-    Route::get('/mensuels', fn() => view('rapports.rapport_mensuels'));
-    Route::get('/trimestriel', fn() => view('rapports.rapport_trimestriel'));
-});
 
 /*
 |--------------------------------------------------------------------------

@@ -19,20 +19,29 @@
 <a href="{{ url('actualites') }}" class="btn">Actualités</a>
 
 <!-- Partenariats -->
-<select name="partenariats" id="partenariats-select" onchange="if(this.value) window.location.href=this.value;">
-    <option value="">Partenariats</option>
-    <option value="{{ url('partenariats/nos') }}">Nos partenaires</option>
-    <option value="{{ url('partenariats/demandes') }}">Demande de partenariat</option>
-</select>
+
+    <a href="{{ url('partenariats/nos') }}">Nos partenaires</a>
 
 <!-- Contact -->
 <a href="{{ url('contact') }}" class="btn">Contact</a>
 
 <!-- Rapports environnementaux -->
-<select name="rapports" id="environnementaux-select" onchange="if(this.value) window.location.href=this.value;">
-    <option value="">Rapports environnementaux</option>
-    <option value="{{ url('rapport/mensuels') }}">Rapports mensuels</option>
-    <option value="{{ url('rapport/trimestriel') }}">Rapports trimestriels</option>
-    <option value="{{ url('rapport/archive') }}">Archives</option>
-</select>
-</div>
+    <!-- Rapports environnementaux -->
+    <select name="rapports" id="environnementaux-select"
+            onchange="if (this.value) window.location.href = this.value;">
+
+        <option value="">-- Rapports environnementaux --</option>
+
+        <option value="{{ route('rapports.mensuel') }}">
+            Rapports mensuels
+        </option>
+
+        <option value="{{ route('rapports.trimestriel') }}">
+            Rapports trimestriels
+        </option>
+
+        <option value="{{ route('rapports.archive') }}">
+            Archives
+        </option>
+
+    </select>

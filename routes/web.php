@@ -7,6 +7,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MesureController;
 use App\Http\Controllers\MouvementStockController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ReleveTerrainController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -66,14 +67,19 @@ Route::prefix('activites')->group(function () {
     Route::get('/recherche', fn() => view('activites.recherche'));
 });
 
-// Rapports environnementaux
-Route::prefix('rapport')->group(function () {
-    Route::get('/archive', fn() => view('rapports.archive'));
-    Route::get('/mensuels', fn() => view('rapports.rapport_mensuels'));
-    Route::get('/trimestriel', fn() => view('rapports.rapport_trimestriel'));
+Route::prefix('rapports')->name('rapports.')->group(function () {
+
+    Route::get('/mensuel', [RapportController::class, 'mensuel'])
+        ->name('mensuel');
+
+    Route::get('/trimestriel', [RapportController::class, 'trimestriel'])
+        ->name('trimestriel');
+
+    Route::get('/archive', [RapportController::class, 'archive'])
+        ->name('archive');
+    Route::get('/{rapport}', [RapportController::class, 'show'])
+        ->name('show');
 });
-
-
 /*
 |--------------------------------------------------------------------------
 | BACK-END ROUTES (SECURISÉES PAR RÔLES)

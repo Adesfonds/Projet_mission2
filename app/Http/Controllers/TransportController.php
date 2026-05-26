@@ -13,17 +13,23 @@ class TransportController extends Controller
     /**
      * Affiche tous les transports
      */
-    public function index()
+    public function index(Request $request)
     {
-        $transports = Transport::with('cargaisons')
-            ->orderBy('date_depart', 'desc')
-            ->get();
+        $query = Transport::with('cargaisons')
+            ->orderBy('date_depart', 'desc');
 
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('destination', 'like', '%' . $request->search . '%')
+                    ->orWhere('statut_transport', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $transports = $query->get();
         $cargaisons = Cargaison::all();
 
         return view('back_end.logistique.suivi', compact('transports', 'cargaisons'));
     }
-
     /**
      * Enregistre un nouveau transport
      */
@@ -50,10 +56,8 @@ class TransportController extends Controller
         $cargaison->statut = 'En transport';
         $cargaison->save();
 
-        // ✅ 3. Charger relation
         $transport->load('cargaisons');
 
-        // ✅ 4. Générer PDF
         $pdf = Pdf::loadView('back_end.logistique.PDF', compact('transport'));
         $fileName = 'bon_transport_' . $transport->id_transport . '.pdf';
 
@@ -131,9 +135,19 @@ class TransportController extends Controller
     /**
      * Liste des PDF
      */
-    public function listePDF()
+    public function listePDF(Request $request)
     {
         $files = Storage::disk('public')->files('bons');
+
+        if ($request->search) {
+            $files = array_filter($files, function ($file) use ($request) {
+                return str_contains(
+                    strtolower(basename($file)),
+                    strtolower($request->search)
+                );
+            });
+        }
+
         return view('back_end.logistique.liste_pdf', compact('files'));
     }
 }

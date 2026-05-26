@@ -4,39 +4,72 @@
 
 @section('content')
 
-    <section id="partenariats">
-        <h1>Partenariats</h1>
+    <section id="partenariats" class="max-w-5xl mx-auto py-16 px-6">
 
-        <p>
-            <strong>VEM</strong> collabore avec de nombreux partenaires académiques, industriels
-            et investisseurs afin de soutenir ses ambitions scientifiques et opérationnelles.
-        </p>
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-green-900 mb-6 leading-tight">
+                Partenariats VEM
+            </h1>
 
-        <h2>Partenariats académiques</h2>
-        <ul>
-            <li>Université Grenoble Alpes – Laboratoire de recherche sur les matériaux et modélisation des données.</li>
-            <li>Doctorants et post-doctorants participant au développement de modèles prédictifs.</li>
-        </ul>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Vercorium Extraction & Modélisation collabore avec des acteurs académiques,
+                industriels et financiers pour développer une exploitation responsable et innovante.
+            </p>
+        </div>
 
-        <h2>Investisseurs et fonds régionaux</h2>
-        <ul>
-            <li>Soutien de fonds européens dédiés aux matières premières critiques.</li>
-            <li>Investisseurs régionaux ayant financé le siège et le site pilote.</li>
-        </ul>
+        <div class="space-y-8">
 
-        <h2>Partenaires industriels et logistiques</h2>
-        <ul>
-            <li>Entreprises locales pour le transport et la logistique du minerai.</li>
-            <li>PME collaborant au développement d’outils numériques et applications métier.</li>
-        </ul>
+            <!-- Académique -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-10">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">
+                    Partenariats académiques
+                </h2>
 
-        <h2>Objectifs des partenariats</h2>
-        <ul>
-            <li>Renforcer l’innovation scientifique autour du vercorium.</li>
-            <li>Soutenir une exploitation minière responsable et durable.</li>
-            <li>Assurer fiabilité des données et traçabilité des échantillons.</li>
-            <li>Développer l’infrastructure technique et les outils numériques de l’entreprise.</li>
-        </ul>
+                <ul class="space-y-3 text-gray-700 leading-relaxed list-disc pl-5">
+                    <li>Université Grenoble Alpes – recherche sur les matériaux et la modélisation des données.</li>
+                    <li>Doctorants et post-doctorants contribuant aux modèles prédictifs du vercorium.</li>
+                </ul>
+            </div>
+
+            <!-- Financement -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-10">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">
+                    Investisseurs et financements
+                </h2>
+
+                <ul class="space-y-3 text-gray-700 leading-relaxed list-disc pl-5">
+                    <li>Fonds européens dédiés aux matières premières critiques.</li>
+                    <li>Investisseurs régionaux soutenant le développement des infrastructures VEM.</li>
+                </ul>
+            </div>
+
+            <!-- Industriel -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-10">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">
+                    Partenaires industriels et logistiques
+                </h2>
+
+                <ul class="space-y-3 text-gray-700 leading-relaxed list-disc pl-5">
+                    <li>Entreprises locales spécialisées dans le transport et la logistique du minerai.</li>
+                    <li>PME technologiques développant des outils numériques et solutions métier.</li>
+                </ul>
+            </div>
+
+            <!-- Objectifs -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-10">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">
+                    Objectifs des partenariats
+                </h2>
+
+                <ul class="space-y-3 text-gray-700 leading-relaxed list-disc pl-5">
+                    <li>Renforcer l’innovation scientifique autour du vercorium.</li>
+                    <li>Garantir une exploitation minière responsable et durable.</li>
+                    <li>Assurer la traçabilité et la fiabilité des données.</li>
+                    <li>Développer l’infrastructure technique et numérique de VEM.</li>
+                </ul>
+            </div>
+
+        </div>
 
     </section>
 

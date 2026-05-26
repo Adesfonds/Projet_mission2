@@ -13,11 +13,22 @@ class CommandeController extends Controller
     /**
      * LISTE DES COMMANDES (SUIVI)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $commandes = Commande::with('fournisseur')
-            ->orderByDesc('date_commande')
-            ->get();
+        $query = Commande::with('fournisseur')
+            ->orderByDesc('date_commande');
+
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('id_commande', 'like', '%' . $request->search . '%')
+                    ->orWhere('statut_commande', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('fournisseur', function ($q2) use ($request) {
+                        $q2->where('nom', 'like', '%' . $request->search . '%');
+                    });
+            });
+        }
+
+        $commandes = $query->get();
 
         return view('back_end.stock.suivre_commande', compact('commandes'));
     }

@@ -1,30 +1,69 @@
 <x-app-layout>
-    <div class="p-6">
 
-        <h2 class="text-xl font-bold mb-4">Détail du matériel</h2>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Détail du matériel
+        </h2>
+    </x-slot>
 
-        <form action="{{ route('stock.update', $materiel->id_materiel) }}" method="POST">
+    <div class="max-w-3xl mx-auto py-8 px-6">
+
+        <form action="{{ route('stock.update', $materiel->id_materiel) }}" method="POST"
+              class="bg-white shadow-lg rounded-2xl border border-gray-100 p-6 space-y-6">
+
             @csrf
             @method('PUT')
 
-            <div class="border p-4 rounded bg-white">
-
-                <label>Nom :</label>
-                <input type="text" name="nom" value="{{ $materiel->nom }}" class="border w-full mb-2">
-
-                <label>Description :</label>
-                <input type="text" name="description" value="{{ $materiel->description }}" class="border w-full mb-2">
-
-                <label>Seuil d’alerte :</label>
-                <input type="number" name="seuil_alerte" value="{{ $materiel->seuil_alerte }}" class="border w-full mb-2">
-
+            {{-- TITRE --}}
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    Informations du matériel
+                </h3>
             </div>
 
-            <button type="submit"
-                    class="bg-blue-600 text-white px-4 py-2 mt-4 rounded">
-                Mettre à jour
-            </button>
+            {{-- NOM --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Nom
+                </label>
+                <input type="text"
+                       name="nom"
+                       value="{{ $materiel->nom }}"
+                       class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            {{-- DESCRIPTION --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                </label>
+                <input type="text"
+                       name="description"
+                       value="{{ $materiel->description }}"
+                       class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            {{-- SEUIL --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Seuil d’alerte
+                </label>
+                <input type="number"
+                       name="seuil_alerte"
+                       value="{{ $materiel->seuil_alerte }}"
+                       class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            {{-- BOUTON --}}
+            <div class="flex justify-end pt-4">
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition">
+                    Mettre à jour
+                </button>
+            </div>
+
         </form>
 
     </div>
+
 </x-app-layout>

@@ -12,11 +12,24 @@ class MouvementStockController extends Controller
     /**
      * HISTORIQUE DES MOUVEMENTS
      */
-    public function index()
+    public function index(Request $request)
     {
-        $mouvements = MouvementStock::with(['materiel', 'utilisateur'])
-            ->orderBy('date_mouvement', 'desc')
-            ->get();
+        $query = MouvementStock::with(['materiel', 'utilisateur'])
+            ->orderBy('date_mouvement', 'desc');
+
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('type_mouvement', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('materiel', function ($q2) use ($request) {
+                        $q2->where('nom', 'like', '%' . $request->search . '%');
+                    })
+                    ->orWhereHas('utilisateur', function ($q3) use ($request) {
+                        $q3->where('name', 'like', '%' . $request->search . '%');
+                    });
+            });
+        }
+
+        $mouvements = $query->get();
 
         return view('back_end.stock.suivi_stock', compact('mouvements'));
     }

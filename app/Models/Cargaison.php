@@ -32,7 +32,11 @@ class Cargaison extends Model
     // Relation transport
     public function transport()
     {
-        return $this->belongsTo(Transport::class, 'id_transport');
+        return $this->belongsTo(
+            Transport::class,
+            'id_transport',
+            'id_transport'
+        );
     }
 
     // Relation utilisateur

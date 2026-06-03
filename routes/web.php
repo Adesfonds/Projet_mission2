@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\CapteurController;
 use App\Http\Controllers\CollecteController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MesureController;
 use App\Http\Controllers\MouvementStockController;
 use App\Http\Controllers\ProfileController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\MineraisController;
 use App\Http\Controllers\SiteController;
 use App\Models\Log;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,7 +60,12 @@ Route::prefix('actualites')->name('actualites.')->group(function () {
     Route::get('/', [ActivityController::class, 'index'])->name('index');
     Route::get('/{activity}', [ActivityController::class, 'show'])->name('show');
 });
+Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 
+Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+
+Route::post('/messages/{message}/verify', [MessageController::class, 'verifierMessage'])
+    ->name('messages.verify');
 // Activités
 Route::prefix('activites')->group(function () {
     Route::get('/administration', fn() => view('activites.administration'));
